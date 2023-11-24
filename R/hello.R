@@ -107,13 +107,19 @@ sim_resources <- sim |>
 
 
 plot(sim_resources, metric = "usage", items = c("server", "queue"), steps = FALSE)
+#plot(sim_resources, metric = "usage", items = c("server", "queue"), steps = TRUE)
 # plot(sim_resources, metric = "usage", items = "server", steps = TRUE)
-# plot(sim_resources, metric = "usage", items = "queue", steps = TRUE)
+plot(sim_resources, metric = "usage", items = "queue", steps = TRUE)
 plot(sim_resources, metric = "utilization")
+
+#plot(sim_attributes)
+
+# plot(sim_arrivals, metric = "activity_time")
+# plot(sim_arrivals, metric = "waiting_time")
+# plot(sim_arrivals, metric = "flow_time")
 
 # time spent in system
 # ggplot(sim_arrivals, aes((end_time - start_time)/60/24)) +
-# #  scale_x_binned(breaks = scales::breaks_pretty(n=10)) +
 #   geom_histogram() +
 #   xlab("Time spent in the system (days)") +
 #   ylab("Number of patients")
