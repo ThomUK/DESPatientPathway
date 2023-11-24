@@ -1,5 +1,6 @@
 library(tidyverse)
 library(simmer)
+library(simmer.plot)
 
 # Time unit  = minutes
 if(exists("env")) env |> reset()
@@ -103,3 +104,16 @@ sim_attributes <- sim |>
 
 sim_resources <- sim |>
   get_mon_resources()
+
+
+plot(sim_resources, metric = "usage", items = c("server", "queue"), steps = FALSE)
+# plot(sim_resources, metric = "usage", items = "server", steps = TRUE)
+# plot(sim_resources, metric = "usage", items = "queue", steps = TRUE)
+plot(sim_resources, metric = "utilization")
+
+# time spent in system
+# ggplot(sim_arrivals, aes((end_time - start_time)/60/24)) +
+# #  scale_x_binned(breaks = scales::breaks_pretty(n=10)) +
+#   geom_histogram() +
+#   xlab("Time spent in the system (days)") +
+#   ylab("Number of patients")
