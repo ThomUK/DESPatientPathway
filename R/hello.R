@@ -49,10 +49,6 @@ branch_discharge_from_op <- trajectory("discharged from OP appt") |>
   set_attribute("discharged home", 1) |>
   log_("Discharged from OP appt")
 
-branch_discharge_from_bed <- trajectory("discharged from bed") |>
-  set_attribute("discharged home", 1) |>
-  log_("Discharged from bed")
-
 branch_followup_later <- trajectory("book OP followup") |>
   set_attribute("OP_fup_booked", 1) |>
   log_("Follow-up OP appt booked") |>
@@ -79,7 +75,8 @@ branch_admit <- trajectory("admit for treatment") |>
   seize("bed") |>
   timeout(dist_post_op_ward_los) |>
   release("bed") |>
-  branch(function() 1, TRUE, branch_discharge_from_bed)
+  set_attribute("discharged home", 1) |>
+  log_("Discharged from bed")
 
 
 # create the overall patient pathway
@@ -94,7 +91,6 @@ patient <- trajectory("patient pathway") |>
   branch(dist_op_outcome, FALSE,
          branch_admit,
          branch_followup_later,
-#         rollback(3),
          branch_discharge_from_op)
 
 
