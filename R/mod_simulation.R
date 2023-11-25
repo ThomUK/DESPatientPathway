@@ -13,7 +13,9 @@ mod_simulation_ui <- function(id){
     sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 104, min = 2, max = 260),
     actionButton(NS(id, "updateButton"), "Update Model!", class = "btn-success"),
 
-    plotOutput(NS(id, "plot"))
+    plotOutput(NS(id, "queuePlot")),
+    plotOutput(NS(id, "serverPlot")),
+    plotOutput(NS(id, "utilisationPlot"))
   )
 }
 
@@ -34,9 +36,16 @@ mod_simulation_server <- function(id){
         get_mon_resources()
 
       # make a plot
-      output$plot <- renderPlot(
-        plot(sim_resources, metric = "usage", items = c("server", "queue"), steps = TRUE) +
+      output$queuePlot <- renderPlot(
+        plot(sim_resources, metric = "usage", items = "queue", steps = TRUE) +
           scale_x_continuous(name = "days", labels = scales::number_format(scale = 1/60/24))  # format labels to represent days
+      )
+      output$serverPlot <- renderPlot(
+        plot(sim_resources, metric = "usage", items = "server", steps = TRUE) +
+          scale_x_continuous(name = "days", labels = scales::number_format(scale = 1/60/24))  # format labels to represent days
+      )
+      output$utilisationPlot <- renderPlot(
+        plot(sim_resources, metric = "utilization")
       )
     })
 
