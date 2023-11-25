@@ -23,7 +23,10 @@ mod_simulation_ui <- function(id){
       div(
         style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px; margin-top: 5px;",
         sliderInput(NS(id, "numOpClinicLength"), "Length of an OP clinic (minutes)", value = 30, min = 5, max = 120),
-
+      ),
+      div(
+        style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px; margin-top: 5px;",
+        numericInput(NS(id, "numBeds"), "Total beds (pre & post-operative combined)", value = 6, min = 1, max = 36),
       )
     ),
     column(
@@ -53,7 +56,8 @@ mod_simulation_server <- function(id){
         pat_backlog_size = input$numPatBacklogSize,
         op_conversion_rate = input$numAdmitConversionRate,
         op_fup_rate = input$numFupRate,
-        op_clinic_length = input$numOpClinicLength
+        op_clinic_length = input$numOpClinicLength,
+        total_beds = input$numBeds
       )
     )
 
