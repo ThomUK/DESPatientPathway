@@ -1,12 +1,8 @@
 Package: DES patient pathway model
-Title: An Amazing Shiny App
+Title: A shiny app modelling hospital patient pathways
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "firstname",
-           family = "lastname",
-           role = c("aut", "cre"),
-           email = "your@email.com")
-Description: What the package does (one paragraph).
+Authors@R: person('Tom', 'Smith', email = 'tomsmith_uk@hotmal.com', role = c('cre', 'aut'))
+Description: A patient pathway modelling app.
 License: What license is it under?
 Imports: 
     config (>= 0.3.1),
