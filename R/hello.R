@@ -29,7 +29,12 @@ dist_post_op_ward_los <- function() rnorm(1, 60*36, sd = 6)
 #dist_post_op_ward_los()
 
 # OP outcoming result. 1 = admit to wl, 2 = OP followup, 3 = discharged
-dist_op_outcome <- function() sample(1:3, 1, FALSE, c(0.10, 0.225, 0.675))
+conv_rate <- 0.1 # this is the percentage of OP appointments requiring admission
+fup_rate <- 0.25 # this is the percentage of OP appointments which are followups
+scaled_fup_rate <- (1 - conv_rate) * fup_rate # scale the rate for a 3-way branch
+scaled_disch_rate <- (1 - conv_rate) * (1 - fup_rate) # scale the rate for a 3-way branch
+
+dist_op_outcome <- function() sample(1:3, 1, FALSE, c(conv_rate, scaled_fup_rate, scaled_disch_rate))
 #dist_op_outcome()
 
 # create some schedules to close resources overnight
