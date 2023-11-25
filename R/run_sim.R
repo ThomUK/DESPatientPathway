@@ -94,7 +94,7 @@ run_sim <- function(model_config){
     #  log_("Referred in") |>
     ## add an intake activity
     seize("OP clinic", 1, tag = "op clinic") |>
-    timeout(function() rnorm(1, mean = 30, sd = 6)) |>
+    timeout(function() rnorm(1, mean = mc$op_clinic_length, sd = 6)) |>
     release("OP clinic", 1) |>
 
     # branch into admission and discharge
