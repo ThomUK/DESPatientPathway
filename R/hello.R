@@ -104,12 +104,13 @@ sim_attributes <- sim |>
 sim_resources <- sim |>
   get_mon_resources()
 
+plot(patient, verbose = TRUE)
 
 plot(sim_resources, metric = "usage", items = c("server", "queue"), steps = FALSE)
 #plot(sim_resources, metric = "usage", items = c("server", "queue"), steps = TRUE)
 # plot(sim_resources, metric = "usage", items = "server", steps = TRUE)
-plot(sim_resources, metric = "usage", items = "queue", steps = TRUE)
-plot(sim_resources, metric = "utilization")
+#plot(sim_resources, metric = "usage", items = "queue", steps = TRUE)
+#plot(sim_resources, metric = "utilization")
 
 #plot(sim_attributes)
 
