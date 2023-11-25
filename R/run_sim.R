@@ -35,9 +35,9 @@ run_sim <- function(model_config){
 
   # OP outcoming result. 1 = admit to wl, 2 = OP followup, 3 = discharged
   # mc$op_conversion_rate is the percentage of OP appointments requiring admission
-  fup_rate <- 0.25 # this is the percentage of OP appointments which are followups
-  scaled_fup_rate <- (1 - mc$op_conversion_rate) * fup_rate # scale the rate for a 3-way branch
-  scaled_disch_rate <- (1 - mc$op_conversion_rate) * (1 - fup_rate) # scale the rate for a 3-way branch
+  # mc$op_fup_rate is the percentage of OP appointments which are followups
+  scaled_fup_rate <- (1 - mc$op_conversion_rate) * mc$op_fup_rate # scale the rate for a 3-way branch
+  scaled_disch_rate <- (1 - mc$op_conversion_rate) * (1 - mc$op_fup_rate) # scale the rate for a 3-way branch
 
   dist_op_outcome <- function() sample(1:3, 1, FALSE, c(mc$op_conversion_rate, scaled_fup_rate, scaled_disch_rate))
   #dist_op_outcome()
