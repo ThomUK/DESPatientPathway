@@ -119,7 +119,8 @@ sim_attributes <- sim |>
 sim_resources <- sim |>
   get_mon_resources()
 
-plot(patient, verbose = TRUE)
+plot(patient, verbose = TRUE) |>
+  htmlwidgets::saveWidget("output/patient_pathway.html")
 
 plot(sim_resources, metric = "usage", items = c("server", "queue"), steps = FALSE) +
   scale_x_continuous(name = "days", labels = scales::number_format(scale = 1/60/24))  # format labels to represent days
