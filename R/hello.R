@@ -29,9 +29,9 @@ plot(sim_resources, metric = "usage", items = c("server", "queue"), steps = FALS
   scale_x_continuous(name = "days", labels = scales::number_format(scale = 1/60/24))  # format labels to represent days
 
 #plot(sim_resources, metric = "usage", items = c("server", "queue"), steps = TRUE)
-# plot(sim_resources, metric = "usage", items = "server", steps = TRUE)
-#plot(sim_resources, metric = "usage", items = "queue", steps = TRUE)
-#plot(sim_resources, metric = "utilization")
+plot(sim_resources, metric = "usage", items = "server", steps = TRUE)
+plot(sim_resources, metric = "usage", items = "queue", steps = TRUE)
+plot(sim_resources, metric = "utilization")
 
 #plot(sim_attributes)
 
