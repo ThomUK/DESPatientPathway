@@ -21,7 +21,7 @@ run_sim <- function(model_config){
   #dist_patient_arrival()
 
   # initial backlog of patients
-  dist_starting_backlog <- at(rep(0,1000)) # 1000 patients backlog
+  dist_starting_backlog <- at(rep(0, mc$pat_backlog_size))
   #dist_starting_backlog()
 
   dist_pre_op_ward_los <- function() rnorm(1, 60*12, sd = 6)

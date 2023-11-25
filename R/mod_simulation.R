@@ -15,6 +15,7 @@ mod_simulation_ui <- function(id){
       style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
       sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 104, min = 2, max = 260),
       sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
+      sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 500, min = 0, max = 5000),
       sliderInput(NS(id, "numAdmitConversionRate"), "Outpatient conversion rate (OP -> admission / treatment waiting list)", value = 0.1, min = 0, max = 1),
       sliderInput(NS(id, "numFupRate"), "Outpatient followup rate", value = 0.25, min = 0, max = 1), #TODO check and improve this logic
     ),
@@ -42,6 +43,7 @@ mod_simulation_server <- function(id){
       list(
         forecast_length = input$numForecastLength,
         pat_referral_rate = input$numPatReferralRate,
+        pat_backlog_size = input$numPatBacklogSize,
         op_conversion_rate = input$numAdmitConversionRate,
         op_fup_rate = input$numFupRate
       )
