@@ -1,4 +1,12 @@
-run_sim <- function(){
+#' Run the model simulation
+#'
+#' @param forecast_length integer. The number of weeks to forecast ahead
+#'
+#' @return simulation
+#' @export
+#' @noRd
+#'
+run_sim <- function(forecast_length){
 
   # Time unit  = minutes
   env <- simmer("pathway")
@@ -101,7 +109,7 @@ run_sim <- function(){
     add_generator("backlog patient", patient, dist_starting_backlog, mon = 2) |>
     add_generator("new patient", patient, dist_patient_arrival, mon = 2)
 
-  env |> run(60*24*365*5) # 60 * 24 * 365 = 1 year
+  env |> run(60*24*7 * forecast_length) # 60 * 24 * 7 = 1 week
 
   return(sim)
 }

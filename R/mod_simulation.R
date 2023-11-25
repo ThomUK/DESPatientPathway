@@ -10,6 +10,7 @@
 mod_simulation_ui <- function(id){
   ns <- NS(id)
   tagList(
+    sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 104, min = 2, max = 260),
     actionButton(NS(id, "updateButton"), "Update Model!", class = "btn-success"),
 
     plotOutput(NS(id, "plot"))
@@ -26,7 +27,7 @@ mod_simulation_server <- function(id){
     observeEvent(input$updateButton, {
 
       # run the simulation
-      sim <- run_sim()
+      sim <- run_sim(input$numForecastLength)
 
       # compute some stats
       sim_resources <- sim |>

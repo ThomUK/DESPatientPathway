@@ -30,6 +30,7 @@ currently hard-coded may be made user-configurable.
 
 #### Examples of configurable items (some are under development):
 
+- Number of weeks to forecast ahead (default is 2 years)
 - Patient referral (arrival) rate
 - Conversion rate (from OP appointment to admission / treatment waiting
   list)

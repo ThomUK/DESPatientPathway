@@ -30,7 +30,7 @@ It presents results graphically wherever possible (some of this is still in deve
 The model uses a blend of hard-coded assumtions, and a set of configurable options.  Over time (or by request), options that are currently hard-coded may be made user-configurable.  
 
 #### Examples of configurable items (some are under development):
-
+* Number of weeks to forecast ahead (default is 2 years)
 * Patient referral (arrival) rate
 * Conversion rate (from OP appointment to admission / treatment waiting list)
 * Outpatient appointment followup rate (what proportion of OP appts are new vs. followups)
