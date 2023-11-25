@@ -7,7 +7,6 @@ if(exists("env")) env |> reset()
 env <- simmer("pathway")
 
 # create the distribution functions
-
 # patient arrivals
 patients_per_month <- 400
 rate <- patients_per_month * 12 / 365 / 24 / 60
@@ -16,20 +15,20 @@ dist_patient_arrival <- function() rexp(1, rate)
 
 # initial backlog of patients
 dist_starting_backlog <- at(rep(0,1000)) # 1000 patients backlog
-dist_starting_backlog()
+#dist_starting_backlog()
 
 dist_pre_op_ward_los <- function() rnorm(1, 60*12, sd = 6)
-dist_pre_op_ward_los()
+#dist_pre_op_ward_los()
 
 dist_operating_time <- function() rnorm(1, 90, sd = 6)
-dist_operating_time()
+#dist_operating_time()
 
 dist_post_op_ward_los <- function() rnorm(1, 60*36, sd = 6)
-dist_post_op_ward_los()
+#dist_post_op_ward_los()
 
 # OP conversion rate. 1 = admitted, 2 = discharged
 dist_op_conversion_rate <- function() sample(1:2, 1, FALSE, c(0.10, 0.9))
-# dist_op_conversion_rate()
+#dist_op_conversion_rate()
 
 # create some schedules to close resources overnight
 op_clinic_schedule <- schedule(
