@@ -10,12 +10,21 @@
 mod_simulation_ui <- function(id){
   ns <- NS(id)
   tagList(
-    sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 104, min = 2, max = 260),
-    actionButton(NS(id, "updateButton"), "Update Model!", class = "btn-success"),
-
-    plotOutput(NS(id, "queuePlot")),
-    plotOutput(NS(id, "serverPlot")),
-    plotOutput(NS(id, "utilisationPlot"))
+    column(
+      width = 6,
+      style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
+      sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 104, min = 2, max = 260),
+      sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
+    ),
+    column(
+      width = 6,
+      actionButton(NS(id, "updateButton"), "Update Model!", class = "btn-success"),
+    ),
+    column(12,
+      plotOutput(NS(id, "queuePlot")),
+      plotOutput(NS(id, "serverPlot")),
+      plotOutput(NS(id, "utilisationPlot"))
+    )
   )
 }
 

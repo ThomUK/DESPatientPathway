@@ -16,8 +16,7 @@ run_sim <- function(model_config){
 
   # create the distribution functions
   # patient arrivals
-  patients_per_month <- 100
-  rate <- patients_per_month * 12 / 365 / 24 / 60
+  rate <- mc$pat_referral_rate * 12 / 365 / 24 / 60 # monthly -> annual, then calculate patients per minute
   dist_patient_arrival <- function() rexp(1, rate)
   #dist_patient_arrival()
 
