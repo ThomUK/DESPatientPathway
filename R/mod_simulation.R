@@ -27,6 +27,8 @@ mod_simulation_ui <- function(id){
       div(
         style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px; margin-top: 5px;",
         numericInput(NS(id, "numBeds"), "Total beds (pre & post-operative combined)", value = 6, min = 1, max = 36),
+        sliderInput(NS(id, "numPreOpLos"), "Average pre-operative length of stay (hours)", value = 6, min = 0, max = 36),
+        sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (hours)", value = 36, min = 1, max = 96),
       )
     ),
     column(
@@ -57,7 +59,9 @@ mod_simulation_server <- function(id){
         op_conversion_rate = input$numAdmitConversionRate,
         op_fup_rate = input$numFupRate,
         op_clinic_length = input$numOpClinicLength,
-        total_beds = input$numBeds
+        total_beds = input$numBeds,
+        pre_op_los = input$numPreOpLos,
+        post_op_los = input$numPostOpLos
       )
     )
 

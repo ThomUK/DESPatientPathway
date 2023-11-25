@@ -24,13 +24,13 @@ run_sim <- function(model_config){
   dist_starting_backlog <- at(rep(0, mc$pat_backlog_size))
   #dist_starting_backlog()
 
-  dist_pre_op_ward_los <- function() rnorm(1, 60*12, sd = 6)
+  dist_pre_op_ward_los <- function() rnorm(1, 60 * mc$pre_op_los, sd = 6)
   #dist_pre_op_ward_los()
 
   dist_operating_time <- function() rnorm(1, 90, sd = 6)
   #dist_operating_time()
 
-  dist_post_op_ward_los <- function() rnorm(1, 60*36, sd = 6)
+  dist_post_op_ward_los <- function() rnorm(1, 60 * mc$post_op_los, sd = 6)
   #dist_post_op_ward_los()
 
   # OP outcoming result. 1 = admit to wl, 2 = OP followup, 3 = discharged
