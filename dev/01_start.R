@@ -25,7 +25,7 @@ golem::fill_desc(
   author_first_name = "Tom", # Your First Name
   author_last_name = "Smith", # Your Last Name
   author_email = "tomsmith_uk@hotmal.com", # Your Email
-  repo_url = NULL, # The URL of the GitHub Repo (optional),
+  repo_url = "https://github.com/ThomUK/DES-patient-pathway-model", # The URL of the GitHub Repo (optional),
   pkg_version = "0.0.0.9000" # The Version of the package containing the App
 )
 
