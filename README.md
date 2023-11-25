@@ -4,6 +4,9 @@
 # DES patient pathway model
 
 <!-- badges: start -->
+
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 This patient pathway model is designed to simulate a typical acute
