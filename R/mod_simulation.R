@@ -26,10 +26,18 @@ mod_simulation_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    # prepare the config object
+    model_config <- reactive(
+      list(
+        forecast_length = input$numForecastLength,
+        pat_referral_rate = input$numPatReferralRate
+      )
+    )
+
     observeEvent(input$updateButton, {
 
       # run the simulation
-      sim <- run_sim(input$numForecastLength)
+      sim <- run_sim(model_config)
 
       # compute some stats
       sim_resources <- sim |>

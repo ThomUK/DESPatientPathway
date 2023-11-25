@@ -1,12 +1,15 @@
 #' Run the model simulation
 #'
-#' @param forecast_length integer. The number of weeks to forecast ahead
+#' @param model_config list. A config object containing variables for model adjustment
 #'
 #' @return simulation
 #' @export
 #' @noRd
 #'
-run_sim <- function(forecast_length){
+run_sim <- function(model_config){
+
+  # read the model config to a short variable name
+  mc <- model_config()
 
   # Time unit  = minutes
   env <- simmer("pathway")
@@ -109,7 +112,7 @@ run_sim <- function(forecast_length){
     add_generator("backlog patient", patient, dist_starting_backlog, mon = 2) |>
     add_generator("new patient", patient, dist_patient_arrival, mon = 2)
 
-  env |> run(60*24*7 * forecast_length) # 60 * 24 * 7 = 1 week
+  env |> run(60*24*7 * mc$forecast_length) # 60 * 24 * 7 = 1 week
 
   return(sim)
 }
