@@ -10,7 +10,9 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic
     fluidPage(
-      h1("DES patient pathway model")
+      h1("DES patient pathway model"),
+      mod_simulation_ui("simulation_1"),
+
     )
   )
 }
