@@ -55,8 +55,8 @@ branch_discharge_from_bed <- trajectory("discharged from bed") |>
 
 branch_followup_later <- trajectory("book OP followup") |>
   set_attribute("OP_fup_booked", 1) |>
-  log_("Follow-up OP appt booked")# |>
-  #rollback(4)
+  log_("Follow-up OP appt booked") |>
+  rollback("op clinic") # rollback to tagged resource
 
 branch_admit <- trajectory("admit for treatment") |>
   set_attribute("admitted_for_treatment", 1) |>
@@ -86,17 +86,16 @@ branch_admit <- trajectory("admit for treatment") |>
 patient <- trajectory("patient pathway") |>
 #  log_("Referred in") |>
   ## add an intake activity
-  seize("OP clinic", 1) |>
+  seize("OP clinic", 1, tag = "op clinic") |>
   timeout(function() rnorm(1, mean = 30, sd = 6)) |>
   release("OP clinic", 1) |>
 
   # branch into admission and discharge
-  branch(dist_op_outcome, TRUE,
+  branch(dist_op_outcome, FALSE,
          branch_admit,
          branch_followup_later,
 #         rollback(3),
          branch_discharge_from_op)
-
 
 
 sim <- env |>
