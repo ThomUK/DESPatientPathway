@@ -15,6 +15,7 @@ mod_simulation_ui <- function(id){
       style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
       sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 104, min = 2, max = 260),
       sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
+      sliderInput(NS(id, "numAdmitConversionRate"), "Outpatient conversion rate (OP -> admission / treatment waiting list)", value = 0.1, min = 0, max = 1),
     ),
     column(
       width = 6,
@@ -39,7 +40,8 @@ mod_simulation_server <- function(id){
     model_config <- reactive(
       list(
         forecast_length = input$numForecastLength,
-        pat_referral_rate = input$numPatReferralRate
+        pat_referral_rate = input$numPatReferralRate,
+        op_conversion_rate = input$numAdmitConversionRate
       )
     )
 
