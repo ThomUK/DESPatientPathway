@@ -2,6 +2,8 @@ library(tidyverse)
 library(simmer)
 library(simmer.plot)
 
+set.seed(1)
+
 # Time unit  = minutes
 if(exists("env")) env |> reset()
 env <- simmer("pathway")
@@ -26,9 +28,9 @@ dist_operating_time <- function() rnorm(1, 90, sd = 6)
 dist_post_op_ward_los <- function() rnorm(1, 60*36, sd = 6)
 #dist_post_op_ward_los()
 
-# OP conversion rate. 1 = admitted, 2 = discharged
-dist_op_conversion_rate <- function() sample(1:2, 1, FALSE, c(0.10, 0.9))
-#dist_op_conversion_rate()
+# OP outcoming result. 1 = admit to wl, 2 = OP followup, 3 = discharged
+dist_op_outcome <- function() sample(1:3, 1, FALSE, c(0.10, 0.225, 0.675))
+#dist_op_outcome()
 
 # create some schedules to close resources overnight
 op_clinic_schedule <- schedule(
@@ -43,6 +45,19 @@ theatre_schedule <- schedule(
 )
 
 # create the patient pathway branches
+branch_discharge_from_op <- trajectory("discharged from OP appt") |>
+  set_attribute("discharged home", 1) |>
+  log_("Discharged from OP appt")
+
+branch_discharge_from_bed <- trajectory("discharged from bed") |>
+  set_attribute("discharged home", 1) |>
+  log_("Discharged from bed")
+
+branch_followup_later <- trajectory("book OP followup") |>
+  set_attribute("OP_fup_booked", 1) |>
+  log_("Follow-up OP appt booked")# |>
+  #rollback(4)
+
 branch_admit <- trajectory("admit for treatment") |>
   set_attribute("admitted_for_treatment", 1) |>
 
@@ -57,32 +72,32 @@ branch_admit <- trajectory("admit for treatment") |>
   seize("theatre") |>
   timeout(dist_operating_time) |>
   release("theatre") |>
-  log_("I'm recovering") |>
+  log_("Im recovering") |>
 
   # take a recovery ward bed
   set_attribute("moved_to_post_op_bed", 1) |>
   seize("bed") |>
   timeout(dist_post_op_ward_los) |>
   release("bed") |>
-  set_attribute("discharged home", 1) |>
-  log_("I'm Home!")
-
-branch_no_admit <- trajectory("not admitted for treatment") |>
-  set_attribute("admitted_for_treatment", 0)
+  branch(function() 1, TRUE, branch_discharge_from_bed)
 
 
 # create the overall patient pathway
 patient <- trajectory("patient pathway") |>
-  log_("I've just been referred in") |>
+#  log_("Referred in") |>
   ## add an intake activity
   seize("OP clinic", 1) |>
   timeout(function() rnorm(1, mean = 30, sd = 6)) |>
   release("OP clinic", 1) |>
 
   # branch into admission and discharge
-  branch(dist_op_conversion_rate, TRUE,
+  branch(dist_op_outcome, TRUE,
          branch_admit,
-         branch_no_admit)
+         branch_followup_later,
+#         rollback(3),
+         branch_discharge_from_op)
+
+
 
 sim <- env |>
   add_resource("OP clinic", op_clinic_schedule, mon = 2) |>
@@ -91,7 +106,7 @@ sim <- env |>
   add_generator("backlog patient", patient, dist_starting_backlog, mon = 2) |>
   add_generator("new patient", patient, dist_patient_arrival, mon = 2)
 
-env |> run(60*24*365*5) # 60 * 24 * 365 = 1 year
+env |> run(60*24*5)#365*5) # 60 * 24 * 365 = 1 year
 
 sim_arrivals <- sim |>
   get_mon_arrivals(per_resource = TRUE) |>
