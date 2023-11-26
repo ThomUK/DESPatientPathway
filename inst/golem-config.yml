@@ -1,5 +1,5 @@
 default:
-  golem_name: DES patient pathway model
+  golem_name: DESPatientPathway
   golem_version: 0.0.0.9000
   app_prod: no
 production:

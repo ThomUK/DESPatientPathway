@@ -1,4 +1,4 @@
-Package: DES patient pathway model
+Package: DESPatientPathway
 Title: A shiny app modelling hospital patient pathways
 Version: 0.0.0.9000
 Authors@R: person('Tom', 'Smith', email = 'tomsmith_uk@hotmal.com', role = c('cre', 'aut'))
@@ -13,3 +13,5 @@ LazyData: true
 RoxygenNote: 7.1.1
 URL: https://github.com/ThomUK/DES-patient-pathway-model
 BugReports: https://github.com/ThomUK/DES-patient-pathway-model/issues
+Suggests: 
+    rmarkdown

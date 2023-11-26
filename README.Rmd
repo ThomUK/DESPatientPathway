@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# DES patient pathway model
+# DES Patient Pathway
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
@@ -56,7 +56,7 @@ The model uses a blend of hard-coded assumtions, and a set of configurable optio
 
 ## Installation
 
-You can install the development version of DES patient pathway model like so:
+You can install the development version of DESPatientPathway like so:
 
 ``` r
 # FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
@@ -67,7 +67,7 @@ You can install the development version of DES patient pathway model like so:
 This is a basic example which shows you how to solve a common problem:
 
 ```{r example, eval=FALSE}
-library("DES patient pathway model")
+library("DESPatientPathway")
 ## basic example code
 ```
 
