@@ -11,6 +11,7 @@ app_ui <- function(request) {
     # Your application UI logic
     fluidPage(
       h1("DES patient pathway model"),
+      HTML("<p>The code for this project is open-source, and is on <a href='https://github.com/ThomUK/DES-patient-pathway-model' target='_blank'>GitHub.</a></p>"),
       mod_simulation_ui("simulation_1"),
 
     )

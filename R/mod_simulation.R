@@ -10,16 +10,30 @@
 mod_simulation_ui <- function(id){
   ns <- NS(id)
   tagList(
+    p("This is a 'Discrete Event Simulation' of the flow of patients through a typical acute trust hopsital service.  Patients are referred in to be seen at an outpatient (OP) clinic.  The clinic takes a decision to admit to waiting list, followup with another clinic appointment later, or discharge completely.  If admitted the patient visits a pre-operative ward, the operating theatre, and finally a post-operative ward before being discharged home."),
+    HTML(
+      "<p>This model is in development.  It is not yet ready to be used for planning.  Some of the issues to be resolved are:<p>
+        <ul>
+          <li>The method used to implement the OP follow-up rate is not accurate.</li>
+          <li>The length of stay and theatre procedure lengths are modelled as normal distributions, but these are typically right-skewed in real data.</li>
+          <li>The OP clinic and Theatre schedules are hard-coded as 8hrs/day, 7days/week.  This needs to be user-configurable.</li>
+          <li>The ward is modelled as a shared pre and post-operative ward, but the priority and behaviour of post-op vs. pre-op patients needs to be checked.</li>
+          <li>Appointment non-attendance is not yet modelled.  Attendance is assumed to be 100%.</li>
+        </ul>"
+    ),
     column(
       width = 6,
       div(
         style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
-        sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 104, min = 2, max = 260),
+        sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 12, min = 1, max = 260),
         sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
         sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 500, min = 0, max = 5000),
         sliderInput(NS(id, "numAdmitConversionRate"), "Outpatient conversion rate (OP -> admission / treatment waiting list)", value = 0.1, min = 0, max = 1),
         sliderInput(NS(id, "numFupRate"), "Outpatient followup rate", value = 0.25, min = 0, max = 1), #TODO check and improve this logic
       ),
+    ),
+    column(
+      width = 6,
       div(
         style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px; margin-top: 5px;",
         sliderInput(NS(id, "numOpClinicLength"), "Length of an OP clinic (minutes)", value = 30, min = 5, max = 120),
@@ -36,8 +50,8 @@ mod_simulation_ui <- function(id){
       )
     ),
     column(
-      width = 6,
-      actionButton(NS(id, "updateButton"), "Update Model!", class = "btn-success"),
+      width = 12,
+      actionButton(NS(id, "updateButton"), "Update Model!", class = "btn-success", width = "100%", style = "margin-top: 10px;"),
     ),
     column(12,
       plotOutput(NS(id, "queuePlot")),
@@ -65,7 +79,8 @@ mod_simulation_server <- function(id){
         op_clinic_length = input$numOpClinicLength,
         total_beds = input$numBeds,
         pre_op_los = input$numPreOpLos,
-        post_op_los = input$numPostOpLos
+        post_op_los = input$numPostOpLos,
+        theatre_proc_length = input$numTheatreProcLength
       )
     )
 
