@@ -62,17 +62,24 @@ currently hard-coded may be made user-configurable.
 
 ## Installation
 
-You can install the development version of DESPatientPathway like so:
+You can install DESPatientPathway like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+# install.packages("remotes")
+remotes::install_github("ThomUK/DESPatientPathway", build_vignettes = TRUE)
 ```
 
-## Example
+## Run the app locally
 
-This is a basic example which shows you how to solve a common problem:
+To run the app on your local machine, use the below:
 
 ``` r
 library("DESPatientPathway")
-## basic example code
+run_app()
+```
+
+or simply:
+
+``` r
+DESPatientPathway::run_app()
 ```
