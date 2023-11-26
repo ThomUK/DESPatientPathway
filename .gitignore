@@ -4,4 +4,6 @@
 .httr-oauth
 .DS_Store
 
+*.dcf
+
 output/
