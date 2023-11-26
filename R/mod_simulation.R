@@ -29,6 +29,10 @@ mod_simulation_ui <- function(id){
         numericInput(NS(id, "numBeds"), "Total beds (pre & post-operative combined)", value = 6, min = 1, max = 36),
         sliderInput(NS(id, "numPreOpLos"), "Average pre-operative length of stay (hours)", value = 6, min = 0, max = 36),
         sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (hours)", value = 36, min = 1, max = 96),
+      ),
+      div(
+        style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px; margin-top: 5px;",
+        sliderInput(NS(id, "numTheatreProcLength"), "Average length of theatre procedures (minutes)", value = 90, min = 5, max = 720),
       )
     ),
     column(
