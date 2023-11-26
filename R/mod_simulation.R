@@ -86,6 +86,12 @@ mod_simulation_server <- function(id){
 
     observeEvent(input$updateButton, {
 
+      # it's most convenient to use library calls while prototyping
+      # may remove later
+      library(simmer)
+      library(simmer.plot)
+      library(ggplot2)
+
       # run the simulation
       sim <- run_sim(model_config)
 
