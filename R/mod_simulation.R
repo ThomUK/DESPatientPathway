@@ -25,7 +25,7 @@ mod_simulation_ui <- function(id){
       width = 6,
       div(
         style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
-        sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 12, min = 1, max = 260),
+        sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 1, min = 1, max = 104),
         sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
         sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 500, min = 0, max = 5000),
         sliderInput(NS(id, "numAdmitConversionRate"), "Outpatient conversion rate (OP -> admission / treatment waiting list)", value = 0.1, min = 0, max = 1),
@@ -51,7 +51,7 @@ mod_simulation_ui <- function(id){
     ),
     column(
       width = 12,
-      actionButton(NS(id, "updateButton"), "Update Model!", class = "btn-success", width = "100%", style = "margin-top: 10px;"),
+      actionButton(NS(id, "updateButton"), "Run Model (Adjust options above, Run the model, Review results below...)", class = "btn-success", width = "100%", style = "margin-top: 10px;"),
     ),
     column(12,
       plotOutput(NS(id, "queuePlot")),
