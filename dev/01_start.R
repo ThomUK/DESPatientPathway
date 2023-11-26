@@ -19,7 +19,7 @@
 ## to change the name in the app_sys() function in app_config.R /!\
 ##
 golem::fill_desc(
-  pkg_name = "DES patient pathway model", # The Name of the package containing the App
+  pkg_name = "DESPatientPathway", # The Name of the package containing the App
   pkg_title = "A shiny app modelling hospital patient pathways", # The Title of the package containing the App
   pkg_description = "A patient pathway modelling app.", # The Description of the package containing the App
   author_first_name = "Tom", # Your First Name

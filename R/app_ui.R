@@ -10,7 +10,8 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic
     fluidPage(
-      h1("DES patient pathway model"),
+      h1("DES Patient Pathway"),
+      HTML("<p>The code for this project is open-source, and is on <a href='https://github.com/ThomUK/DES-patient-pathway-model' target='_blank'>GitHub.</a></p>"),
       mod_simulation_ui("simulation_1"),
 
     )
@@ -35,7 +36,7 @@ golem_add_external_resources <- function() {
     favicon(),
     bundle_resources(
       path = app_sys("app/www"),
-      app_title = "DES patient pathway model"
+      app_title = "DESPatientPathway"
     )
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()

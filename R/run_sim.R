@@ -1,35 +1,45 @@
-run_sim <- function(){
+#' Run the model simulation
+#'
+#' @param model_config list. A config object containing variables for model adjustment
+#'
+#' @return simulation
+#' @export
+#' @noRd
+#'
+run_sim <- function(model_config){
+
+  # read the model config to a short variable name
+  mc <- model_config()
 
   # Time unit  = minutes
   env <- simmer("pathway")
 
   # create the distribution functions
   # patient arrivals
-  patients_per_month <- 100
-  rate <- patients_per_month * 12 / 365 / 24 / 60
+  rate <- mc$pat_referral_rate * 12 / 365 / 24 / 60 # monthly -> annual, then calculate patients per minute
   dist_patient_arrival <- function() rexp(1, rate)
   #dist_patient_arrival()
 
   # initial backlog of patients
-  dist_starting_backlog <- at(rep(0,1000)) # 1000 patients backlog
+  dist_starting_backlog <- at(rep(0, mc$pat_backlog_size))
   #dist_starting_backlog()
 
-  dist_pre_op_ward_los <- function() rnorm(1, 60*12, sd = 6)
+  dist_pre_op_ward_los <- function() rnorm(1, 60 * mc$pre_op_los, sd = 6)
   #dist_pre_op_ward_los()
 
-  dist_operating_time <- function() rnorm(1, 90, sd = 6)
+  dist_operating_time <- function() rnorm(1, mc$theatre_proc_length, sd = 6)
   #dist_operating_time()
 
-  dist_post_op_ward_los <- function() rnorm(1, 60*36, sd = 6)
+  dist_post_op_ward_los <- function() rnorm(1, 60 * mc$post_op_los, sd = 6)
   #dist_post_op_ward_los()
 
   # OP outcoming result. 1 = admit to wl, 2 = OP followup, 3 = discharged
-  conv_rate <- 0.1 # this is the percentage of OP appointments requiring admission
-  fup_rate <- 0.25 # this is the percentage of OP appointments which are followups
-  scaled_fup_rate <- (1 - conv_rate) * fup_rate # scale the rate for a 3-way branch
-  scaled_disch_rate <- (1 - conv_rate) * (1 - fup_rate) # scale the rate for a 3-way branch
+  # mc$op_conversion_rate is the percentage of OP appointments requiring admission
+  # mc$op_fup_rate is the percentage of OP appointments which are followups
+  scaled_fup_rate <- (1 - mc$op_conversion_rate) * mc$op_fup_rate # scale the rate for a 3-way branch
+  scaled_disch_rate <- (1 - mc$op_conversion_rate) * (1 - mc$op_fup_rate) # scale the rate for a 3-way branch
 
-  dist_op_outcome <- function() sample(1:3, 1, FALSE, c(conv_rate, scaled_fup_rate, scaled_disch_rate))
+  dist_op_outcome <- function() sample(1:3, 1, FALSE, c(mc$op_conversion_rate, scaled_fup_rate, scaled_disch_rate))
   #dist_op_outcome()
 
   # create some schedules to close resources overnight
@@ -84,7 +94,7 @@ run_sim <- function(){
     #  log_("Referred in") |>
     ## add an intake activity
     seize("OP clinic", 1, tag = "op clinic") |>
-    timeout(function() rnorm(1, mean = 30, sd = 6)) |>
+    timeout(function() rnorm(1, mean = mc$op_clinic_length, sd = 6)) |>
     release("OP clinic", 1) |>
 
     # branch into admission and discharge
@@ -96,12 +106,12 @@ run_sim <- function(){
 
   sim <- env |>
     add_resource("OP clinic", op_clinic_schedule, mon = 2) |>
-    add_resource("bed", 2, mon = 2) |> # 2 beds
+    add_resource("bed", mc$total_beds, mon = 2) |>
     add_resource("theatre", capacity = theatre_schedule, queue_size = 0, mon = 2) |>
     add_generator("backlog patient", patient, dist_starting_backlog, mon = 2) |>
     add_generator("new patient", patient, dist_patient_arrival, mon = 2)
 
-  env |> run(60*24*365*5) # 60 * 24 * 365 = 1 year
+  env |> run(60*24*7 * mc$forecast_length) # 60 * 24 * 7 = 1 week
 
   return(sim)
 }

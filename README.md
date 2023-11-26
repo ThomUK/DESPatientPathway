@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# DES patient pathway model
+# DES Patient Pathway
 
 <!-- badges: start -->
 
@@ -30,6 +30,7 @@ currently hard-coded may be made user-configurable.
 
 #### Examples of configurable items (some are under development):
 
+- Number of weeks to forecast ahead (default is 2 years)
 - Patient referral (arrival) rate
 - Conversion rate (from OP appointment to admission / treatment waiting
   list)
@@ -61,8 +62,7 @@ currently hard-coded may be made user-configurable.
 
 ## Installation
 
-You can install the development version of DES patient pathway model
-like so:
+You can install the development version of DESPatientPathway like so:
 
 ``` r
 # FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
@@ -73,6 +73,6 @@ like so:
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-library("DES patient pathway model")
+library("DESPatientPathway")
 ## basic example code
 ```
