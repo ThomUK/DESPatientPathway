@@ -188,7 +188,7 @@ mod_simulation_server <- function(id){
             title = "Queue size",
             y = "Number of patients"
           ) +
-          theme_minimal() +
+          theme_minimal(base_size = 16) +
           theme(legend.position = "none")
       )
       output$serverPlot <- renderPlot(
@@ -199,7 +199,7 @@ mod_simulation_server <- function(id){
             subtitle = "Dotted line = max capacity, Solid line = actual usage",
             y = "Used"
           ) +
-          theme_minimal() +
+          theme_minimal(base_size = 16) +
           theme(legend.position = "none")
       )
       output$utilisationPlot <- renderPlot(
@@ -209,7 +209,7 @@ mod_simulation_server <- function(id){
             x = "Resource",
             y = "Utilisation"
           ) +
-          theme_minimal()
+          theme_minimal(base_size = 16)
       )
       output$trajectoryPlot <- DiagrammeR::renderGrViz(
         plot(patient, verbose = TRUE)
