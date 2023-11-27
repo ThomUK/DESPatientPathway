@@ -13,12 +13,8 @@ mod_simulation_ui <- function(id){
     p("This is a 'Discrete Event Simulation' of the flow of patients through a typical acute trust hopsital service.  Patients are referred in to be seen at an outpatient (OP) clinic.  The clinic takes a decision to admit to waiting list, followup with another clinic appointment later, or discharge completely.  If admitted the patient visits a pre-operative ward, the operating theatre, and finally a post-operative ward before being discharged home."),
     fluidRow(
       column(
-        width = 6,
-        imageOutput(
-          NS(id, "pathwaySketch"),
-          width = "50%",  # Set width to 100% for responsiveness
-          height = "auto"  # Set height to auto to maintain aspect ratio)
-        )
+        width = 12,
+        DiagrammeR::grVizOutput(NS(id, "pathwayDiagram"))
       )
     ),
     fluidRow(
@@ -111,12 +107,49 @@ mod_simulation_server <- function(id){
       )
     )
 
-    # render the static image
-    output$pathwaySketch <- renderImage({
-      list(
-        src = "www/pathway_sketch.jpg"
-      )
-    }, deleteFile = FALSE)
+    # pathway diagram
+    output$pathwayDiagram <- DiagrammeR::renderGrViz(DiagrammeR::grViz(
+      "
+      digraph {
+
+        # graph attributes
+        graph [layout = dot,
+                rankdir = LR,
+                fontname = Arial,
+                label = 'Patient Pathway',
+                labelloc = t]
+
+        # node attributes
+        node [shape = box,
+              color = black,
+              height = 0.8,
+              width = 1.5]
+
+        # edge attributes
+        edge [color = black]
+
+        # node statements
+        A [label = 'Patient \n Referral', shape = circle, width = 1.2];
+        B [label = 'Outpatient \n Appointment', fillcolor = Linen];
+        C [label = 'Pre-Op Bed', fillcolor = Linen];
+        D [label = 'Operating \n Theatre', fillcolor = Linen];
+        E [label = 'Post-Op Bed', fillcolor = Linen];
+        F [label = 'Discharge \n Home', shape = circle, width = 1.2];
+
+
+        # edge statements
+
+        A->B;
+        B->C;
+        B->B [dir=back, label = 'Followup \n arranged'];
+        C->D;
+        D->E;
+        E->F;
+        B->F;
+
+      }
+      ")
+    )
 
     observeEvent(input$updateButton, {
 
