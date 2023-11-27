@@ -135,7 +135,10 @@ mod_simulation_server <- function(id){
 
       # compute some stats
       sim_resources <- sim |>
-        get_mon_resources()
+        get_mon_resources() |>
+        dplyr::mutate(
+          resource = factor(resource, levels = c("OP clinic", "theatre", "bed"))
+        )
 
       # make a plot
       output$queuePlot <- renderPlot(
