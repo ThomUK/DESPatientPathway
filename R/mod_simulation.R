@@ -137,7 +137,7 @@ mod_simulation_server <- function(id){
       sim_resources <- sim |>
         get_mon_resources() |>
         dplyr::mutate(
-          resource = factor(resource, levels = c("OP clinic", "theatre", "bed"))
+          resource = factor(resource, levels = c("OP Clinic", "Theatre", "Bed"))
         )
 
       # make a plot
