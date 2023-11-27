@@ -143,23 +143,33 @@ mod_simulation_server <- function(id){
       # make a plot
       output$queuePlot <- renderPlot(
         plot(sim_resources, metric = "usage", items = "queue", steps = TRUE) +
-          scale_x_continuous(name = "days", labels = scales::number_format(scale = 1/60/24)) + # format labels to represent days
+          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 1/60/24)) + # format labels to represent days
           labs(
             title = "Queue size",
             y = "Number of patients"
-          )
+          ) +
+          theme_minimal() +
+          theme(legend.position = "none")
       )
       output$serverPlot <- renderPlot(
         plot(sim_resources, metric = "usage", items = "server", steps = TRUE) +
-          scale_x_continuous(name = "days", labels = scales::number_format(scale = 1/60/24)) + # format labels to represent days
+          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 1/60/24)) + # format labels to represent days
             scale_color_manual(values = "lightgreen") +
-          labs(
+            labs(
             subtitle = "Dotted line = max capacity, Solid line = actual usage",
             y = "Used"
-          )
+          ) +
+          theme_minimal() +
+          theme(legend.position = "none")
       )
       output$utilisationPlot <- renderPlot(
-        plot(sim_resources, metric = "utilization")
+        plot(sim_resources, metric = "utilization") +
+          labs(
+            title = "Resource utilisation",
+            x = "Resource",
+            y = "Utilisation"
+          ) +
+          theme_minimal()
       )
       output$trajectoryPlot <- DiagrammeR::renderGrViz(
         plot(patient, verbose = TRUE)
