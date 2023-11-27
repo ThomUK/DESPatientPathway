@@ -62,29 +62,29 @@ run_sim <- function(model_config){
   branch_followup_later <- trajectory("book OP followup") |>
     set_attribute("OP_fup_booked", 1) |>
     log_("Follow-up OP appt booked") |>
-    rollback("op clinic") # rollback to tagged resource
+    rollback("op_clinic") # rollback to tagged resource
 
   branch_admit <- trajectory("admit for treatment") |>
     set_attribute("admitted_for_treatment", 1) |>
 
     # take a pre-op bed
     set_attribute("moved_to_pre_op_bed", 1) |>
-    seize("bed") |>
+    seize("Bed") |>
     timeout(dist_pre_op_ward_los) |>
-    release("bed") |>
+    release("Bed") |>
 
     # operate
     set_attribute("moved_to_theatre", 1) |>
-    seize("theatre") |>
+    seize("Theatre") |>
     timeout(dist_operating_time) |>
-    release("theatre") |>
+    release("Theatre") |>
     log_("Im recovering") |>
 
     # take a recovery ward bed
     set_attribute("moved_to_post_op_bed", 1) |>
-    seize("bed") |>
+    seize("Bed") |>
     timeout(dist_post_op_ward_los) |>
-    release("bed") |>
+    release("Bed") |>
     set_attribute("discharged home", 1) |>
     log_("Discharged from bed")
 
@@ -93,9 +93,9 @@ run_sim <- function(model_config){
   patient <- trajectory("patient pathway") |>
     #  log_("Referred in") |>
     ## add an intake activity
-    seize("OP clinic", 1, tag = "op clinic") |>
+    seize("OP Clinic", 1, tag = "op_clinic") |>
     timeout(function() rnorm(1, mean = mc$op_clinic_length, sd = 6)) |>
-    release("OP clinic", 1) |>
+    release("OP Clinic", 1) |>
 
     # branch into admission and discharge
     branch(dist_op_outcome, FALSE,
@@ -105,9 +105,9 @@ run_sim <- function(model_config){
 
 
   sim <- env |>
-    add_resource("OP clinic", op_clinic_schedule, mon = 2) |>
-    add_resource("bed", mc$total_beds, mon = 2) |>
-    add_resource("theatre", capacity = theatre_schedule, queue_size = 0, mon = 2) |>
+    add_resource("OP Clinic", op_clinic_schedule, mon = 2) |>
+    add_resource("Bed", mc$total_beds, mon = 2) |>
+    add_resource("Theatre", capacity = theatre_schedule, queue_size = 0, mon = 2) |>
     add_generator("backlog patient", patient, dist_starting_backlog, mon = 2) |>
     add_generator("new patient", patient, dist_patient_arrival, mon = 2)
 
