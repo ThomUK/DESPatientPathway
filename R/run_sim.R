@@ -113,5 +113,9 @@ run_sim <- function(model_config){
 
   env |> run(60*24*7 * mc$forecast_length) # 60 * 24 * 7 = 1 week
 
-  return(sim)
+  res <- list(
+    sim = sim,
+    patient = patient
+  )
+  return(res)
 }

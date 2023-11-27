@@ -66,7 +66,9 @@ mod_simulation_ui <- function(id){
     column(12,
       plotOutput(NS(id, "queuePlot")),
       plotOutput(NS(id, "serverPlot")),
-      plotOutput(NS(id, "utilisationPlot"))
+      plotOutput(NS(id, "utilisationPlot")),
+      h4("Patient pathway:"),
+      DiagrammeR::grVizOutput(NS(id, "trajectoryPlot"), height = "2000px")
     )
   )
 }
@@ -103,7 +105,11 @@ mod_simulation_server <- function(id){
       library(ggplot2)
 
       # run the simulation
-      sim <- run_sim(model_config)
+      res <- run_sim(model_config)
+
+      # extract data from the result object
+      sim <- res$sim
+      patient <- res$patient
 
       # compute some stats
       sim_resources <- sim |>
@@ -120,6 +126,9 @@ mod_simulation_server <- function(id){
       )
       output$utilisationPlot <- renderPlot(
         plot(sim_resources, metric = "utilization")
+      )
+      output$trajectoryPlot <- DiagrammeR::renderGrViz(
+        plot(patient, verbose = TRUE)
       )
     })
 
