@@ -75,11 +75,16 @@ mod_simulation_ui <- function(id){
       actionButton(NS(id, "updateButton"), "Run Model (Adjust options above, Run the model, Review results below...)", class = "btn-success", width = "100%", style = "margin-top: 10px;"),
     ),
     column(12,
+      hr(),
       plotOutput(NS(id, "queuePlot")),
+      hr(),
       plotOutput(NS(id, "serverPlot")),
+      hr(),
       plotOutput(NS(id, "utilisationPlot")),
+      hr(),
       h4("Patient pathway:"),
-      DiagrammeR::grVizOutput(NS(id, "trajectoryPlot"), height = "2000px")
+      DiagrammeR::grVizOutput(NS(id, "trajectoryPlot"), height = "2000px"),
+      hr()
     )
   )
 }
