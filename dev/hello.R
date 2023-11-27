@@ -24,8 +24,8 @@ model_config <- function(){
 }
 
 # run the simulation
-sim <- run_sim(model_config = model_config)
-
+res <- run_sim(model_config = model_config)
+sim <- res$sim
 
 sim_arrivals <- sim |>
   get_mon_arrivals(per_resource = TRUE, ongoing = TRUE) |>
@@ -35,7 +35,10 @@ sim_attributes <- sim |>
   get_mon_attributes()
 
 sim_resources <- sim |>
-  get_mon_resources()
+  get_mon_resources() |>
+  dplyr::mutate(
+    resource = factor(resource, levels = c("OP Clinic", "Theatre", "Bed"))
+  )
 
 plot(get_mon_arrivals(sim), metric = "waiting_time")
 
