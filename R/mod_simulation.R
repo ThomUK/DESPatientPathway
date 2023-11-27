@@ -152,6 +152,7 @@ mod_simulation_server <- function(id){
       output$serverPlot <- renderPlot(
         plot(sim_resources, metric = "usage", items = "server", steps = TRUE) +
           scale_x_continuous(name = "days", labels = scales::number_format(scale = 1/60/24)) + # format labels to represent days
+            scale_color_manual(values = "lightgreen") +
           labs(
             subtitle = "Dotted line = max capacity, Solid line = actual usage",
             y = "Used"
