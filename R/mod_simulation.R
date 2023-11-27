@@ -122,6 +122,8 @@ mod_simulation_server <- function(id){
         # node attributes
         node [shape = box,
               color = black,
+              style = filled,
+              fillcolor = White;
               height = 0.8,
               width = 1.5]
 
