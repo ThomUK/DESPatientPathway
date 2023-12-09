@@ -53,9 +53,13 @@ mod_simulation_ui <- function(id){
         )
       )
     ),
-    column(
-      width = 12,
-      actionButton(NS(id, "updateButton"), "Run Model (Adjust options above, Run the model, Review results below...)", class = "btn-success", width = "100%", style = "margin-top: 10px;"),
+    fluidRow(
+      column(1),
+      column(
+        width = 10,
+        actionButton(NS(id, "updateButton"), "Run Model", class = "btn-success", width = "100%", style = "margin-top: 10px;"),
+      ),
+      column(1)
     ),
     column(12,
       hr(),
