@@ -26,7 +26,6 @@ mod_simulation_ui <- function(id){
               <li>Is the main queue appearing in the right place?  Is the typical real waiting list post referral and pre OP appointment, or is it post OP appt and pre-admission.</li>
               <li>How to model the queue between OP appt and hospital admission?</li>
               <li>The method used to implement the OP follow-up rate is not accurate.</li>
-              <li>The length of stay and theatre procedure lengths are modelled as normal distributions, but these are typically right-skewed in real data.</li>
               <li>Appointment non-attendance is not yet modelled.  Attendance is assumed to be 100%.</li>
               <li>The ward is modelled as a shared pre and post-operative ward, but the priority and behaviour of post-op vs. pre-op patients needs to be checked.</li>
               <li>Need to add an additional class of 'priority' patients (eg. cancer) in parallel to the standard patients. Define the queuing behaviour.</li>
