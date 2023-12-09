@@ -11,27 +11,11 @@ mod_simulation_ui <- function(id){
   ns <- NS(id)
   tagList(
     p("This is a 'Discrete Event Simulation' of the flow of patients through a typical acute trust hopsital service.  Patients are referred in to be seen at an outpatient (OP) clinic.  The clinic takes a decision to admit to waiting list, followup with another clinic appointment later, or discharge completely.  If admitted the patient visits a pre-operative ward, the operating theatre, and finally a post-operative ward before being discharged home."),
+    p("This model is in development.  It is not yet ready to be used for planning.  See the 'Notes & Assumptions' tab for more details."),
     fluidRow(
       column(
         width = 12,
         DiagrammeR::grVizOutput(NS(id, "pathwayDiagram"))
-      )
-    ),
-    fluidRow(
-      column(
-        width = 12,
-        p("This model is in development.  It is not yet ready to be used for planning.  Some of the issues to be resolved are detailed below."),
-        HTML(
-            "<ul>
-              <li>Is the main queue appearing in the right place?  Is the typical real waiting list post referral and pre OP appointment, or is it post OP appt and pre-admission.</li>
-              <li>How to model the queue between OP appt and hospital admission?</li>
-              <li>The method used to implement the OP follow-up rate is not accurate.</li>
-              <li>Appointment non-attendance is not yet modelled.  Attendance is assumed to be 100%.</li>
-              <li>The ward is modelled as a shared pre and post-operative ward, but the priority and behaviour of post-op vs. pre-op patients needs to be checked.</li>
-              <li>Need to add an additional class of 'priority' patients (eg. cancer) in parallel to the standard patients. Define the queuing behaviour.</li>
-              <li>The OP clinic and Theatre schedules are hard-coded as 8hrs/day, 7days/week.  This needs to be user-configurable.</li>
-            </ul>"
-        )
       )
     ),
     fluidRow(

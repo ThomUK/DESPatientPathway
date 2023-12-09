@@ -12,9 +12,7 @@ app_ui <- function(request) {
     navbarPage(
       title = "DES Patient Pathway",
       tabPanel("Simulation", mod_simulation_ui("simulation_1")),
-      tabPanel("Notes & Assumptions",
-        HTML("<p>The code for this project is open-source, and is on <a href='https://github.com/ThomUK/DESPatientPathway' target='_blank'>GitHub.</a></p>"),
-      ),
+      tabPanel("Notes & Assumptions", mod_assumptions_ui("assumptions_1")),
     )
   )
 }
