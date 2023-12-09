@@ -55,8 +55,9 @@ mod_simulation_ui <- function(id){
     ),
     fluidRow(
       column(1),
+      column(2, bookmarkButton(style = "margin-top: 10px;")),
       column(
-        width = 10,
+        width = 8,
         actionButton(NS(id, "updateButton"), "Run Model", class = "btn-success", width = "100%", style = "margin-top: 10px;"),
       ),
       column(1)
