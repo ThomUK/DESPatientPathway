@@ -11,28 +11,11 @@ mod_simulation_ui <- function(id){
   ns <- NS(id)
   tagList(
     p("This is a 'Discrete Event Simulation' of the flow of patients through a typical acute trust hopsital service.  Patients are referred in to be seen at an outpatient (OP) clinic.  The clinic takes a decision to admit to waiting list, followup with another clinic appointment later, or discharge completely.  If admitted the patient visits a pre-operative ward, the operating theatre, and finally a post-operative ward before being discharged home."),
+    p("This model is in development.  It is not yet ready to be used for planning.  See the 'Notes & Assumptions' tab for more details."),
     fluidRow(
       column(
         width = 12,
         DiagrammeR::grVizOutput(NS(id, "pathwayDiagram"))
-      )
-    ),
-    fluidRow(
-      column(
-        width = 12,
-        p("This model is in development.  It is not yet ready to be used for planning.  Some of the issues to be resolved are detailed below."),
-        HTML(
-            "<ul>
-              <li>Is the main queue appearing in the right place?  Is the typical real waiting list post referral and pre OP appointment, or is it post OP appt and pre-admission.</li>
-              <li>How to model the queue between OP appt and hospital admission?</li>
-              <li>The method used to implement the OP follow-up rate is not accurate.</li>
-              <li>The length of stay and theatre procedure lengths are modelled as normal distributions, but these are typically right-skewed in real data.</li>
-              <li>Appointment non-attendance is not yet modelled.  Attendance is assumed to be 100%.</li>
-              <li>The ward is modelled as a shared pre and post-operative ward, but the priority and behaviour of post-op vs. pre-op patients needs to be checked.</li>
-              <li>Need to add an additional class of 'priority' patients (eg. cancer) in parallel to the standard patients. Define the queuing behaviour.</li>
-              <li>The OP clinic and Theatre schedules are hard-coded as 8hrs/day, 7days/week.  This needs to be user-configurable.</li>
-            </ul>"
-        )
       )
     ),
     fluidRow(
@@ -65,14 +48,19 @@ mod_simulation_ui <- function(id){
           sliderInput(NS(id, "numFupRate"), "Outpatient followup rate", value = 0.25, min = 0, max = 1), #TODO check and improve this logic
           sliderInput(NS(id, "numAdmitConversionRate"), "Outpatient conversion rate (OP -> admission / treatment waiting list)", value = 0.1, min = 0, max = 1),
           sliderInput(NS(id, "numPreOpLos"), "Average pre-operative length of stay (hours)", value = 6, min = 0, max = 36),
-          sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (hours)", value = 36, min = 1, max = 96),
+          sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (days)", value = 3, min = 0, max = 42, step = 0.1),
           sliderInput(NS(id, "numTheatreProcLength"), "Average length of theatre procedures (minutes)", value = 90, min = 5, max = 720),
         )
       )
     ),
-    column(
-      width = 12,
-      actionButton(NS(id, "updateButton"), "Run Model (Adjust options above, Run the model, Review results below...)", class = "btn-success", width = "100%", style = "margin-top: 10px;"),
+    fluidRow(
+      column(1),
+      column(2, bookmarkButton(style = "margin-top: 10px;")),
+      column(
+        width = 8,
+        actionButton(NS(id, "updateButton"), "Run Model", class = "btn-success", width = "100%", style = "margin-top: 10px;"),
+      ),
+      column(1)
     ),
     column(12,
       hr(),

@@ -7,3 +7,4 @@
 *.dcf
 
 output/
+local_development_files/
