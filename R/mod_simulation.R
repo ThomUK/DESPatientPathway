@@ -10,6 +10,7 @@
 mod_simulation_ui <- function(id){
   ns <- NS(id)
   tagList(
+    shinyjs::useShinyjs(),
     p("This is a 'Discrete Event Simulation' of the flow of patients through a typical acute trust hopsital service.  Patients are referred in to be seen at an outpatient (OP) clinic.  The clinic takes a decision to admit to waiting list, followup with another clinic appointment later, or discharge completely.  If admitted the patient visits a pre-operative ward, the operating theatre, and finally a post-operative ward before being discharged home."),
     p("This model is in development.  It is not yet ready to be used for planning.  See the 'Notes & Assumptions' tab for more details."),
     fluidRow(
@@ -45,8 +46,9 @@ mod_simulation_ui <- function(id){
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
           sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 500, min = 0, max = 5000),
           sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
-          sliderInput(NS(id, "numFupRate"), "Outpatient followup rate", value = 0.25, min = 0, max = 1), #TODO check and improve this logic
-          sliderInput(NS(id, "numAdmitConversionRate"), "Outpatient conversion rate (OP -> admission / treatment waiting list)", value = 0.1, min = 0, max = 1),
+          sliderInput(NS(id, "numOPOutcomeFup"), "OP outcome: Book followup (%)", value = 25, min = 0, max = 100),
+          sliderInput(NS(id, "numOPOutcomeAdmit"), "OP outcome: Admit (%)", value = 10 , min = 0, max = 100),
+          uiOutput(NS(id, "OPOutcomeDischarge")), # a shinyjs output
           sliderInput(NS(id, "numPreOpLos"), "Average pre-operative length of stay (hours)", value = 6, min = 0, max = 36),
           sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (days)", value = 3, min = 0, max = 42, step = 0.1),
           sliderInput(NS(id, "numTheatreProcLength"), "Average length of theatre procedures (minutes)", value = 90, min = 5, max = 720),
@@ -84,14 +86,34 @@ mod_simulation_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    #### REACTIVITY ####
+    # display a disabled input for the discharge rate (which depends on followup and admit rates)
+    output$OPOutcomeDischarge = renderUI({
+      shinyjs::disabled(sliderInput(inputId = "OPOutcomeDischarge", label = "OP outcome: Discharge (%)",
+                                    min = 0, max = 100, value = max(0, (100 - input$numOPOutcomeFup - input$numOPOutcomeAdmit))))
+    })
+
+    # handle the cases where discharge rate is already zero
+    observeEvent(input$numOPOutcomeFup,  {
+      if(input$numOPOutcomeFup + input$numOPOutcomeAdmit > 100){
+        updateSliderInput(session = session, inputId = "numOPOutcomeAdmit", value = 100 - input$numOPOutcomeFup)
+      }
+    })
+    observeEvent(input$numOPOutcomeAdmit,  {
+      if(input$numOPOutcomeFup + input$numOPOutcomeAdmit > 100){
+        updateSliderInput(session = session, inputId = "numOPOutcomeFup", value = 100 - input$numOPOutcomeAdmit)
+      }
+    })
+
+
     # prepare the config object
     model_config <- reactive(
       list(
         forecast_length = input$numForecastLength,
         pat_referral_rate = input$numPatReferralRate,
         pat_backlog_size = input$numPatBacklogSize,
-        op_conversion_rate = input$numAdmitConversionRate,
-        op_fup_rate = input$numFupRate,
+        op_admit_rate = input$numOPOutcomeAdmit,
+        op_fup_rate = input$numOPOutcomeFup,
         op_clinic_length = input$numOpClinicLength,
         total_beds = input$numBeds,
         pre_op_los = input$numPreOpLos,
