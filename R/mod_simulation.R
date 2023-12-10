@@ -129,48 +129,72 @@ mod_simulation_server <- function(id) {
 
     # pathway diagram
     output$pathwayDiagram <- DiagrammeR::renderGrViz(DiagrammeR::grViz(
-      "
+      '
       digraph {
 
         # graph attributes
         graph [layout = dot,
                 rankdir = LR,
                 fontname = Arial,
-                label = 'Patient Pathway',
-                labelloc = t]
+                label = "Patient Pathway",
+                labelloc = t,
+                ordering = out]
 
-        # node attributes
-        node [shape = box,
+        # circle nodes
+        node [shape = circle,
               color = black,
               style = filled,
               fillcolor = White;
+              width = 1.2]
+              A;F;
+
+        # rectangle nodes
+        node [shape = box,
+              color = black,
+              style = filled,
+              fillcolor = Linen,
               height = 0.8,
-              width = 1.5]
+              width = 1.5
+              ]
+              B;C;D;E;
+
+        # nodes for comments (easier to place than edge comments)
+        node [  shape = plain
+                style = ""]
+                c1;c2
 
         # edge attributes
-        edge [color = black]
+        edge [  color = black,
+                minlen = 2]
 
         # node statements
-        A [label = 'Patient \n Referral', shape = circle, width = 1.2];
-        B [label = 'Outpatient \n Appointment', fillcolor = Linen];
-        C [label = 'Pre-Op Bed', fillcolor = Linen];
-        D [label = 'Operating \n Theatre', fillcolor = Linen];
-        E [label = 'Post-Op Bed', fillcolor = Linen];
-        F [label = 'Discharge \n Home', shape = circle, width = 1.2];
-
+        A [label = "Patient \n Referral"];
+        B [label = "Outpatient \n Appointment"];
+        C [label = "Pre-Op Bed"];
+        D [label = "Operating \n Theatre"];
+        E [label = "Post-Op Bed"];
+        F [label = "Discharge \n Home"];
+        c1 [label = "Followup \n arranged"];
+        c2 [label = "DNA \n (clinic slot \nwasted)"];
 
         # edge statements
-
         A->B;
-        B->C;
-        B->B [dir=back, label = 'Followup \n arranged'];
+        B:e->C;
+        {
+            rank=same
+            B:ne->c2:e;
+            c2:w->B:nw;
+            B:se->c1:e;
+            c1:w->B:sw;
+
+        }
+        B:e->F;
         C->D;
         D->E;
         E->F;
-        B->F;
 
       }
-      "
+      '
     ))
 
     observeEvent(input$updateButton, {
