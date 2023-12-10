@@ -46,6 +46,7 @@ mod_simulation_ui <- function(id) {
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
           sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 500, min = 0, max = 5000),
           sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
+          sliderInput(NS(id, "numOPDNA"), "OP DNA rate (%)", value = 10, min = 0, max = 100),
           sliderInput(NS(id, "numOPOutcomeFup"), "OP outcome: Book followup (%)", value = 25, min = 0, max = 100),
           sliderInput(NS(id, "numOPOutcomeAdmit"), "OP outcome: Admit (%)", value = 10, min = 0, max = 100),
           uiOutput(NS(id, "OPOutcomeDischarge")), # a shinyjs output
@@ -115,6 +116,7 @@ mod_simulation_server <- function(id) {
         forecast_length = input$numForecastLength,
         pat_referral_rate = input$numPatReferralRate,
         pat_backlog_size = input$numPatBacklogSize,
+        op_dna_rate = input$numOPDNA,
         op_admit_rate = input$numOPOutcomeAdmit,
         op_fup_rate = input$numOPOutcomeFup,
         op_clinic_length = input$numOpClinicLength,
