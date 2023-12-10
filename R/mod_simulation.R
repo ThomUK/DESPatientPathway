@@ -11,7 +11,8 @@ mod_simulation_ui <- function(id) {
   ns <- NS(id)
   tagList(
     shinyjs::useShinyjs(),
-    p("This is a 'Discrete Event Simulation' of the flow of patients through a typical acute trust hopsital service.  Patients are referred in to be seen at an outpatient (OP) clinic.  The clinic takes a decision to admit to waiting list, followup with another clinic appointment later, or discharge completely.  If admitted the patient visits a pre-operative ward, the operating theatre, and finally a post-operative ward before being discharged home."),
+    p("This is a 'Discrete Event Simulation' of the flow of patients through a typical acute trust hopsital service."),
+    p("Patients are referred in to be seen at an outpatient (OP) clinic.  The patients either attend, or do not attend (DNA).  DNAs are re-booked and these patients re-join the clinic waiting list.  Patients that attend the clinic are either admitted to the treatment waiting list, re-booked for a followup appointment, or are discharged completely.  If admitted the patient visits a pre-operative bed, the operating theatre, then a post-operative bed before being discharged home.  The pre and post-operative beds are a shared resource on the same ward."),
     p("This model is in development.  It is not yet ready to be used for planning.  See the 'Notes & Assumptions' tab for more details."),
     fluidRow(
       column(
@@ -46,6 +47,7 @@ mod_simulation_ui <- function(id) {
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
           sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 500, min = 0, max = 5000),
           sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
+          sliderInput(NS(id, "numOPDNA"), "OP DNA rate (%)", value = 10, min = 0, max = 100),
           sliderInput(NS(id, "numOPOutcomeFup"), "OP outcome: Book followup (%)", value = 25, min = 0, max = 100),
           sliderInput(NS(id, "numOPOutcomeAdmit"), "OP outcome: Admit (%)", value = 10, min = 0, max = 100),
           uiOutput(NS(id, "OPOutcomeDischarge")), # a shinyjs output
@@ -115,6 +117,7 @@ mod_simulation_server <- function(id) {
         forecast_length = input$numForecastLength,
         pat_referral_rate = input$numPatReferralRate,
         pat_backlog_size = input$numPatBacklogSize,
+        op_dna_rate = input$numOPDNA,
         op_admit_rate = input$numOPOutcomeAdmit,
         op_fup_rate = input$numOPOutcomeFup,
         op_clinic_length = input$numOpClinicLength,
@@ -127,48 +130,72 @@ mod_simulation_server <- function(id) {
 
     # pathway diagram
     output$pathwayDiagram <- DiagrammeR::renderGrViz(DiagrammeR::grViz(
-      "
+      '
       digraph {
 
         # graph attributes
         graph [layout = dot,
                 rankdir = LR,
                 fontname = Arial,
-                label = 'Patient Pathway',
-                labelloc = t]
+                label = "Patient Pathway",
+                labelloc = t,
+                ordering = out]
 
-        # node attributes
-        node [shape = box,
+        # circle nodes
+        node [shape = circle,
               color = black,
               style = filled,
               fillcolor = White;
+              width = 1.2]
+              A;F;
+
+        # rectangle nodes
+        node [shape = box,
+              color = black,
+              style = filled,
+              fillcolor = Linen,
               height = 0.8,
-              width = 1.5]
+              width = 1.5
+              ]
+              B;C;D;E;
+
+        # nodes for comments (easier to place than edge comments)
+        node [  shape = plain
+                style = ""]
+                c1;c2
 
         # edge attributes
-        edge [color = black]
+        edge [  color = black,
+                minlen = 2]
 
         # node statements
-        A [label = 'Patient \n Referral', shape = circle, width = 1.2];
-        B [label = 'Outpatient \n Appointment', fillcolor = Linen];
-        C [label = 'Pre-Op Bed', fillcolor = Linen];
-        D [label = 'Operating \n Theatre', fillcolor = Linen];
-        E [label = 'Post-Op Bed', fillcolor = Linen];
-        F [label = 'Discharge \n Home', shape = circle, width = 1.2];
-
+        A [label = "Patient \n Referral"];
+        B [label = "Outpatient \n Appointment"];
+        C [label = "Pre-Op Bed"];
+        D [label = "Operating \n Theatre"];
+        E [label = "Post-Op Bed"];
+        F [label = "Discharge \n Home"];
+        c1 [label = "Followup \n arranged"];
+        c2 [label = "DNA \n (clinic slot \nwasted)"];
 
         # edge statements
-
         A->B;
-        B->C;
-        B->B [dir=back, label = 'Followup \n arranged'];
+        B:e->C;
+        {
+            rank=same
+            B:ne->c2:e;
+            c2:w->B:nw;
+            B:se->c1:e;
+            c1:w->B:sw;
+
+        }
+        B:e->F;
         C->D;
         D->E;
         E->F;
-        B->F;
 
       }
-      "
+      '
     ))
 
     observeEvent(input$updateButton, {
