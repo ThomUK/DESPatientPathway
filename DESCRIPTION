@@ -12,6 +12,7 @@ Imports:
     pkgload,
     scales,
     shiny (>= 1.7.4),
+    shinyjs,
     simmer,
     simmer.plot
 Encoding: UTF-8
