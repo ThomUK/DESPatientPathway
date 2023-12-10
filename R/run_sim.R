@@ -13,7 +13,8 @@ run_sim <- function(model_config) {
   # Time unit  = minutes
   env <- simmer("pathway")
 
-  # create the distribution functions
+  #### create the distribution functions ####
+  ## continuous distributions ##
   # patient arrivals
   rate <- mc$pat_referral_rate * 12 / 365 / 24 / 60 # monthly -> annual, then calculate patients per minute
   dist_patient_arrival <- function() rexp(1, rate)
@@ -31,6 +32,11 @@ run_sim <- function(model_config) {
 
   dist_post_op_ward_los <- function() rexp(1, 1 / (60 * 24 * mc$post_op_los)) # 60x24 = days
   # dist_post_op_ward_los()
+
+  ## discrete distributions ##
+  # OP did not attend (DNA) rate. 0 = attended, 1 = did not attend
+  dist_op_dna <- function() sample(0:1, 1, FALSE, c(100 - mc$op_dna_rate, mc$op_dna_rate))
+  dist_op_dna()
 
   # OP outcoming result. 1 = admit to wl, 2 = OP followup, 3 = discharged
   op_disch_rate <- (100 - mc$op_admit_rate - mc$op_fup_rate)
