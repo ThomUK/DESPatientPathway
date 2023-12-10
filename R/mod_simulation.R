@@ -11,7 +11,8 @@ mod_simulation_ui <- function(id) {
   ns <- NS(id)
   tagList(
     shinyjs::useShinyjs(),
-    p("This is a 'Discrete Event Simulation' of the flow of patients through a typical acute trust hopsital service.  Patients are referred in to be seen at an outpatient (OP) clinic.  The clinic takes a decision to admit to waiting list, followup with another clinic appointment later, or discharge completely.  If admitted the patient visits a pre-operative ward, the operating theatre, and finally a post-operative ward before being discharged home."),
+    p("This is a 'Discrete Event Simulation' of the flow of patients through a typical acute trust hopsital service."),
+    p("Patients are referred in to be seen at an outpatient (OP) clinic.  The patients either attend, or do not attend (DNA).  DNAs are re-booked and these patients re-join the clinic waiting list.  Patients that attend the clinic are either admitted to the treatment waiting list, re-booked for a followup appointment, or are discharged completely.  If admitted the patient visits a pre-operative bed, the operating theatre, then a post-operative bed before being discharged home.  The pre and post-operative beds are a shared resource on the same ward."),
     p("This model is in development.  It is not yet ready to be used for planning.  See the 'Notes & Assumptions' tab for more details."),
     fluidRow(
       column(

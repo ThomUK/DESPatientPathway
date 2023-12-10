@@ -19,7 +19,6 @@ mod_assumptions_ui <- function(id) {
           "<ul>
               <li>Is the main queue appearing in the right place?  Is the typical real waiting list post referral and pre OP appointment, or is it post OP appt and pre-admission.</li>
               <li>How to model the queue between OP appt and hospital admission?</li>
-              <li>Appointment non-attendance is not yet modelled.  Attendance is assumed to be 100%.</li>
               <li>The ward is modelled as a shared pre and post-operative ward, but the priority and behaviour of post-op vs. pre-op patients needs to be checked.</li>
               <li>Need to add an additional class of 'priority' patients (eg. cancer) in parallel to the standard patients. Define the queuing behaviour.</li>
               <li>The OP clinic and Theatre schedules are hard-coded as 8hrs/day, 7days/week.  This needs to be user-configurable.</li>
