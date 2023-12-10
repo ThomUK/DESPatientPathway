@@ -4,10 +4,10 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
-#' @importFrom shiny NS tagList 
-mod_assumptions_ui <- function(id){
+#' @importFrom shiny NS tagList
+mod_assumptions_ui <- function(id) {
   ns <- NS(id)
   tagList(
     HTML("<p>The code for this project is open-source, and is on <a href='https://github.com/ThomUK/DESPatientPathway' target='_blank'>GitHub.</a></p>"),
@@ -16,7 +16,7 @@ mod_assumptions_ui <- function(id){
         width = 12,
         p("This model is in development.  It is not yet ready to be used for planning.  Some of the issues to be resolved are detailed below."),
         HTML(
-            "<ul>
+          "<ul>
               <li>Is the main queue appearing in the right place?  Is the typical real waiting list post referral and pre OP appointment, or is it post OP appt and pre-admission.</li>
               <li>How to model the queue between OP appt and hospital admission?</li>
               <li>Appointment non-attendance is not yet modelled.  Attendance is assumed to be 100%.</li>
@@ -29,19 +29,18 @@ mod_assumptions_ui <- function(id){
     ),
   )
 }
-    
+
 #' assumptions Server Functions
 #'
-#' @noRd 
-mod_assumptions_server <- function(id){
-  moduleServer( id, function(input, output, session){
+#' @noRd
+mod_assumptions_server <- function(id) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
- 
   })
 }
-    
+
 ## To be copied in the UI
 # mod_assumptions_ui("assumptions_1")
-    
+
 ## To be copied in the server
 # mod_assumptions_server("assumptions_1")

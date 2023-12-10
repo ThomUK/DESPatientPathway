@@ -6,8 +6,7 @@
 #' @export
 #' @noRd
 #'
-run_sim <- function(model_config){
-
+run_sim <- function(model_config) {
   # read the model config to a short variable name
   mc <- model_config()
 
@@ -18,37 +17,37 @@ run_sim <- function(model_config){
   # patient arrivals
   rate <- mc$pat_referral_rate * 12 / 365 / 24 / 60 # monthly -> annual, then calculate patients per minute
   dist_patient_arrival <- function() rexp(1, rate)
-  #dist_patient_arrival()
+  # dist_patient_arrival()
 
   # initial backlog of patients
   dist_starting_backlog <- at(rep(0, mc$pat_backlog_size))
-  #dist_starting_backlog()
+  # dist_starting_backlog()
 
   dist_pre_op_ward_los <- function() rexp(1, 1 / (60 * mc$pre_op_los)) # x60 = hours
-  #dist_pre_op_ward_los()
+  # dist_pre_op_ward_los()
 
   dist_operating_time <- function() rexp(1, 1 / mc$theatre_proc_length) # minutes
-  #dist_operating_time()
+  # dist_operating_time()
 
   dist_post_op_ward_los <- function() rexp(1, 1 / (60 * 24 * mc$post_op_los)) # 60x24 = days
-  #dist_post_op_ward_los()
+  # dist_post_op_ward_los()
 
   # OP outcoming result. 1 = admit to wl, 2 = OP followup, 3 = discharged
   op_disch_rate <- (100 - mc$op_admit_rate - mc$op_fup_rate)
 
   dist_op_outcome <- function() sample(1:3, 1, FALSE, c(mc$op_admit_rate, mc$op_fup_rate, op_disch_rate))
-  #dist_op_outcome()
+  # dist_op_outcome()
 
   # create some schedules to close resources overnight
   op_clinic_schedule <- schedule(
-    c(60*8, 60*16),
+    c(60 * 8, 60 * 16),
     c(1, 0),
-    period = 60*24
+    period = 60 * 24
   )
   theatre_schedule <- schedule(
-    c(60*8, 60*16),
+    c(60 * 8, 60 * 16),
     c(1, 0),
-    period = 60*24
+    period = 60 * 24
   )
 
   # create the patient pathway branches
@@ -63,20 +62,17 @@ run_sim <- function(model_config){
 
   branch_admit <- trajectory("admit for treatment") |>
     set_attribute("admitted_for_treatment", 1) |>
-
     # take a pre-op bed
     set_attribute("moved_to_pre_op_bed", 1) |>
     seize("Bed") |>
     timeout(dist_pre_op_ward_los) |>
     release("Bed") |>
-
     # operate
     set_attribute("moved_to_theatre", 1) |>
     seize("Theatre") |>
     timeout(dist_operating_time) |>
     release("Theatre") |>
     log_("Im recovering") |>
-
     # take a recovery ward bed
     set_attribute("moved_to_post_op_bed", 1) |>
     seize("Bed") |>
@@ -93,12 +89,13 @@ run_sim <- function(model_config){
     seize("OP Clinic", 1, tag = "op_clinic") |>
     timeout(function() rnorm(1, mean = mc$op_clinic_length, sd = 6)) |>
     release("OP Clinic", 1) |>
-
     # branch into admission and discharge
-    branch(dist_op_outcome, FALSE,
-           branch_admit,
-           branch_followup_later,
-           branch_discharge_from_op)
+    branch(
+      dist_op_outcome, FALSE,
+      branch_admit,
+      branch_followup_later,
+      branch_discharge_from_op
+    )
 
 
   sim <- env |>
@@ -108,7 +105,7 @@ run_sim <- function(model_config){
     add_generator("backlog patient", patient, dist_starting_backlog, mon = 2) |>
     add_generator("new patient", patient, dist_patient_arrival, mon = 2)
 
-  env |> run(60*24*7 * mc$forecast_length) # 60 * 24 * 7 = 1 week
+  env |> run(60 * 24 * 7 * mc$forecast_length) # 60 * 24 * 7 = 1 week
 
   res <- list(
     sim = sim,

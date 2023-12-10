@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_simulation_ui <- function(id){
+mod_simulation_ui <- function(id) {
   ns <- NS(id)
   tagList(
     shinyjs::useShinyjs(),
@@ -47,7 +47,7 @@ mod_simulation_ui <- function(id){
           sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 500, min = 0, max = 5000),
           sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
           sliderInput(NS(id, "numOPOutcomeFup"), "OP outcome: Book followup (%)", value = 25, min = 0, max = 100),
-          sliderInput(NS(id, "numOPOutcomeAdmit"), "OP outcome: Admit (%)", value = 10 , min = 0, max = 100),
+          sliderInput(NS(id, "numOPOutcomeAdmit"), "OP outcome: Admit (%)", value = 10, min = 0, max = 100),
           uiOutput(NS(id, "OPOutcomeDischarge")), # a shinyjs output
           sliderInput(NS(id, "numPreOpLos"), "Average pre-operative length of stay (hours)", value = 6, min = 0, max = 36),
           sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (days)", value = 3, min = 0, max = 42, step = 0.1),
@@ -64,7 +64,8 @@ mod_simulation_ui <- function(id){
       ),
       column(1)
     ),
-    column(12,
+    column(
+      12,
       hr(),
       plotOutput(NS(id, "queuePlot")),
       hr(),
@@ -82,25 +83,27 @@ mod_simulation_ui <- function(id){
 #' simulation Server Functions
 #'
 #' @noRd
-mod_simulation_server <- function(id){
-  moduleServer( id, function(input, output, session){
+mod_simulation_server <- function(id) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     #### REACTIVITY ####
     # display a disabled input for the discharge rate (which depends on followup and admit rates)
-    output$OPOutcomeDischarge = renderUI({
-      shinyjs::disabled(sliderInput(inputId = "OPOutcomeDischarge", label = "OP outcome: Discharge (%)",
-                                    min = 0, max = 100, value = max(0, (100 - input$numOPOutcomeFup - input$numOPOutcomeAdmit))))
+    output$OPOutcomeDischarge <- renderUI({
+      shinyjs::disabled(sliderInput(
+        inputId = "OPOutcomeDischarge", label = "OP outcome: Discharge (%)",
+        min = 0, max = 100, value = max(0, (100 - input$numOPOutcomeFup - input$numOPOutcomeAdmit))
+      ))
     })
 
     # handle the cases where discharge rate is already zero
-    observeEvent(input$numOPOutcomeFup,  {
-      if(input$numOPOutcomeFup + input$numOPOutcomeAdmit > 100){
+    observeEvent(input$numOPOutcomeFup, {
+      if (input$numOPOutcomeFup + input$numOPOutcomeAdmit > 100) {
         updateSliderInput(session = session, inputId = "numOPOutcomeAdmit", value = 100 - input$numOPOutcomeFup)
       }
     })
-    observeEvent(input$numOPOutcomeAdmit,  {
-      if(input$numOPOutcomeFup + input$numOPOutcomeAdmit > 100){
+    observeEvent(input$numOPOutcomeAdmit, {
+      if (input$numOPOutcomeFup + input$numOPOutcomeAdmit > 100) {
         updateSliderInput(session = session, inputId = "numOPOutcomeFup", value = 100 - input$numOPOutcomeAdmit)
       }
     })
@@ -165,11 +168,10 @@ mod_simulation_server <- function(id){
         B->F;
 
       }
-      ")
-    )
+      "
+    ))
 
     observeEvent(input$updateButton, {
-
       # it's most convenient to use library calls while prototyping
       # may remove later
       library(simmer)
@@ -193,7 +195,7 @@ mod_simulation_server <- function(id){
       # make a plot
       output$queuePlot <- renderPlot(
         plot(sim_resources, metric = "usage", items = "queue", steps = TRUE) +
-          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 1/60/24)) + # format labels to represent days
+          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 1 / 60 / 24)) + # format labels to represent days
           labs(
             title = "Queue size",
             y = "Number of patients"
@@ -203,9 +205,9 @@ mod_simulation_server <- function(id){
       )
       output$serverPlot <- renderPlot(
         plot(sim_resources, metric = "usage", items = "server", steps = TRUE) +
-          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 1/60/24)) + # format labels to represent days
-            scale_color_manual(values = "lightgreen") +
-            labs(
+          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 1 / 60 / 24)) + # format labels to represent days
+          scale_color_manual(values = "lightgreen") +
+          labs(
             subtitle = "Dotted line = max capacity, Solid line = actual usage",
             y = "Used"
           ) +
@@ -224,10 +226,7 @@ mod_simulation_server <- function(id){
       output$trajectoryPlot <- DiagrammeR::renderGrViz(
         plot(patient, verbose = TRUE)
       )
-
-
     })
-
   })
 }
 
