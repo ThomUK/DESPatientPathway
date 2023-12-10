@@ -59,41 +59,44 @@ run_sim <- function(model_config) {
   # create the patient pathway branches
   branch_op_dna <- trajectory("op did not attend") |>
     # the dna consumes the same clinic resource as an attendance
-    set_attribute("did not attend OP", 1) |>
-    log_("DNA OP appt") |>
+    log_("OP: DNA") |>
+    set_attribute("OP appt DNA", 1) |>
     timeout(function() rnorm(1, mean = mc$op_clinic_length, sd = 6)) |>
     release("OP Clinic", 1) |>
     rollback("op_clinic") # rollback to tagged resource
 
   branch_discharge_from_op <- trajectory("discharged from OP appt") |>
-    set_attribute("discharged home", 1) |>
-    log_("Discharged from OP appt")
+    log_("OP outcome: Discharge") |>
+    set_attribute("discharged home", 1)
 
   branch_followup_later <- trajectory("book OP followup") |>
+    log_("OP outcome: Follow-up later") |>
     set_attribute("OP_fup_booked", 1) |>
-    log_("Follow-up OP appt booked") |>
     rollback("op_clinic") # rollback to tagged resource
 
   branch_admit <- trajectory("admit for treatment") |>
+    log_("OP outcome: Admit") |>
     set_attribute("admitted_for_treatment", 1) |>
     # take a pre-op bed
-    set_attribute("moved_to_pre_op_bed", 1) |>
     seize("Bed") |>
+    log_("Pre-op bed") |>
+    set_attribute("moved_to_pre_op_bed", 1) |>
     timeout(dist_pre_op_ward_los) |>
     release("Bed") |>
     # operate
-    set_attribute("moved_to_theatre", 1) |>
     seize("Theatre") |>
+    log_("Theatre") |>
+    set_attribute("moved_to_theatre", 1) |>
     timeout(dist_operating_time) |>
     release("Theatre") |>
-    log_("Im recovering") |>
     # take a recovery ward bed
-    set_attribute("moved_to_post_op_bed", 1) |>
     seize("Bed") |>
+    log_("Post-op bed") |>
+    set_attribute("moved_to_post_op_bed", 1) |>
     timeout(dist_post_op_ward_los) |>
     release("Bed") |>
-    set_attribute("discharged home", 1) |>
-    log_("Discharged from bed")
+    log_("IP discharged") |>
+    set_attribute("discharged home", 1)
 
 
   # create the overall patient pathway
@@ -110,6 +113,8 @@ run_sim <- function(model_config) {
     ) |>
 
     # if no DNA, continue with the OP appointment
+    log_("OP: Attended") |>
+    set_attribute("OP appt attended", 1) |>
     timeout(function() rnorm(1, mean = mc$op_clinic_length, sd = 6)) |>
     release("OP Clinic", 1) |>
 
