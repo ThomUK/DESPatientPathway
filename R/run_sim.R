@@ -57,6 +57,14 @@ run_sim <- function(model_config) {
   )
 
   # create the patient pathway branches
+  branch_op_dna <- trajectory("op did not attend") |>
+    # the dna consumes the same clinic resource as an attendance
+    set_attribute("did not attend OP", 1) |>
+    log_("DNA OP appt") |>
+    timeout(function() rnorm(1, mean = mc$op_clinic_length, sd = 6)) |>
+    release("OP Clinic", 1) |>
+    rollback("op_clinic") # rollback to tagged resource
+
   branch_discharge_from_op <- trajectory("discharged from OP appt") |>
     set_attribute("discharged home", 1) |>
     log_("Discharged from OP appt")
@@ -93,11 +101,22 @@ run_sim <- function(model_config) {
     #  log_("Referred in") |>
     ## add an intake activity
     seize("OP Clinic", 1, tag = "op_clinic") |>
+
+    # create a branch to model OP DNAs
+    branch(
+      dist_op_dna,
+      continue = FALSE,
+      branch_op_dna
+    ) |>
+
+    # if no DNA, continue with the OP appointment
     timeout(function() rnorm(1, mean = mc$op_clinic_length, sd = 6)) |>
     release("OP Clinic", 1) |>
+
     # branch into admission and discharge
     branch(
-      dist_op_outcome, FALSE,
+      dist_op_outcome,
+      continue = FALSE,
       branch_admit,
       branch_followup_later,
       branch_discharge_from_op
