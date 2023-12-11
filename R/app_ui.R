@@ -13,6 +13,7 @@ app_ui <- function(request) {
       title = "DES Patient Pathway",
       tabPanel("Simulation", mod_simulation_ui("simulation_1")),
       tabPanel("Notes & Assumptions", mod_assumptions_ui("assumptions_1")),
+      tabPanel("Changelog", uiOutput('news_changelog'))
     )
   )
 }
