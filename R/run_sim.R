@@ -27,9 +27,6 @@ run_sim <- function(model_config) {
   dist_pre_op_ward_los <- function() rexp(1, 1 / (mc$pre_op_los / 7)) # days to weeks
   # dist_pre_op_ward_los()
 
-  dist_operating_time <- function() rexp(1, 1 / (mc$theatre_proc_length / 60 / 24 / 7 )) # minutes to weeks
-  # dist_operating_time()
-
   dist_post_op_ward_los <- function() rexp(1, 1 / (mc$post_op_los / 7)) # days to weeks
   # dist_post_op_ward_los()
 
@@ -75,7 +72,7 @@ run_sim <- function(model_config) {
     seize("Theatre") |>
     log_("Theatre") |>
     set_attribute("moved_to_theatre", 1) |>
-    timeout(dist_operating_time) |>
+    timeout(1 / mc$theatre_slots) |>
     release("Theatre") |>
     # take a recovery ward bed
     seize("Bed") |>

@@ -34,7 +34,8 @@ mod_simulation_ui <- function(id) {
         h4("Service config:"),
         div(
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px; margin-top: 5px;",
-          sliderInput(NS(id, "numOpClinicSlots"), "Number of OP clinic slots per week", value = 100, min = 0, max = 1400),
+          sliderInput(NS(id, "numOpClinicSlots"), "Number of OP clinic slots (patients per week)", value = 25, min = 0, max = 1400),
+          sliderInput(NS(id, "numTheatreSlots"), "Number of theatre slots (patients per week)", value = 4, min = 0, max = 200),
           numericInput(NS(id, "numBeds"), "Total beds (pre & post-operative combined)", value = 6, min = 1, max = 36),
         )
       )
@@ -52,8 +53,7 @@ mod_simulation_ui <- function(id) {
           sliderInput(NS(id, "numOPOutcomeAdmit"), "OP outcome: Admit (%)", value = 10, min = 0, max = 100),
           uiOutput(NS(id, "OPOutcomeDischarge")), # a shinyjs output
           sliderInput(NS(id, "numPreOpLos"), "Average pre-operative length of stay (days)", value = 0.2, min = 0, max = 7, step = 0.1),
-          sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (days)", value = 1.8, min = 0, max = 42, step = 0.1),
-          sliderInput(NS(id, "numTheatreProcLength"), "Average length of theatre procedures (minutes)", value = 90, min = 5, max = 720),
+          sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (days)", value = 1.8, min = 0, max = 42, step = 0.1)
         )
       )
     ),
@@ -124,7 +124,7 @@ mod_simulation_server <- function(id) {
         total_beds = input$numBeds,
         pre_op_los = input$numPreOpLos,
         post_op_los = input$numPostOpLos,
-        theatre_proc_length = input$numTheatreProcLength
+        theatre_slots = input$numTheatreSlots
       )
     )
 
