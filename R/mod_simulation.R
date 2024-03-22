@@ -23,15 +23,18 @@ mod_simulation_ui <- function(id) {
     fluidRow(
       column(
         width = 6,
-        h4("Model options:"),
+        h4("Demand:"),
         div(
-          style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
-          sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 52, min = 1, max = 208),
+          style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px; margin-top: 5px;",
+          sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
+          sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 0, min = 0, max = 5000),
         )
-      ),
+      )
+    ),
+    fluidRow(
       column(
         width = 6,
-        h4("Service config:"),
+        h4("Capacity:"),
         div(
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px; margin-top: 5px;",
           sliderInput(NS(id, "numOpClinicSlots"), "Number of OP clinic slots (patients per week)", value = 25, min = 0, max = 1400),
@@ -43,17 +46,25 @@ mod_simulation_ui <- function(id) {
     fluidRow(
       column(
         width = 6,
-        h4("Patient pathway config:"),
+        h4("Service performance:"),
         div(
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
-          sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 0, min = 0, max = 5000),
-          sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
           sliderInput(NS(id, "numOPDNA"), "OP DNA rate (%)", value = 10, min = 0, max = 100),
           sliderInput(NS(id, "numOPOutcomeFup"), "OP outcome: Book followup (%)", value = 25, min = 0, max = 100),
           sliderInput(NS(id, "numOPOutcomeAdmit"), "OP outcome: Admit (%)", value = 10, min = 0, max = 100),
           uiOutput(NS(id, "OPOutcomeDischarge")), # a shinyjs output
           sliderInput(NS(id, "numPreOpLos"), "Average pre-operative length of stay (days)", value = 0.2, min = 0, max = 7, step = 0.1),
           sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (days)", value = 1.8, min = 0, max = 42, step = 0.1)
+        )
+      )
+    ),
+    fluidRow(
+      column(
+        width = 6,
+        h4("Model options:"),
+        div(
+          style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
+          sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 52, min = 1, max = 208),
         )
       )
     ),
