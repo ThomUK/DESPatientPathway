@@ -44,18 +44,6 @@ run_sim <- function(model_config) {
   dist_op_outcome <- function() sample(1:3, 1, FALSE, c(mc$op_admit_rate, mc$op_fup_rate, op_disch_rate))
   # dist_op_outcome()
 
-  # create some schedules to close resources overnight
-  op_clinic_schedule <- schedule(
-    c(60 * 8, 60 * 16),
-    c(1, 0),
-    period = 60 * 24
-  )
-  theatre_schedule <- schedule(
-    c(60 * 8, 60 * 16),
-    c(1, 0),
-    period = 60 * 24
-  )
-
   # create the patient pathway branches
   branch_op_dna <- trajectory("op did not attend") |>
     # the dna consumes the same clinic resource as an attendance
@@ -129,9 +117,9 @@ run_sim <- function(model_config) {
 
 
   sim <- env |>
-    add_resource("OP Clinic", op_clinic_schedule, mon = 2) |>
+    add_resource("OP Clinic", capacity = 1, mon = 2) |>
     add_resource("Bed", mc$total_beds, mon = 2) |>
-    add_resource("Theatre", capacity = theatre_schedule, queue_size = 0, mon = 2) |>
+    add_resource("Theatre", capacity = 1, queue_size = 0, mon = 2) |>
     add_generator("backlog patient", patient, dist_starting_backlog, mon = 2) |>
     add_generator("new patient", patient, dist_patient_arrival, mon = 2)
 
