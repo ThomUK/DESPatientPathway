@@ -34,7 +34,7 @@ mod_simulation_ui <- function(id) {
         h4("Service config:"),
         div(
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px; margin-top: 5px;",
-          sliderInput(NS(id, "numOpClinicLength"), "Length of an OP clinic (minutes)", value = 30, min = 5, max = 120),
+          sliderInput(NS(id, "numOpClinicSlots"), "Number of OP clinic slots per week", value = 100, min = 0, max = 1400),
           numericInput(NS(id, "numBeds"), "Total beds (pre & post-operative combined)", value = 6, min = 1, max = 36),
         )
       )
@@ -120,7 +120,7 @@ mod_simulation_server <- function(id) {
         op_dna_rate = input$numOPDNA,
         op_admit_rate = input$numOPOutcomeAdmit,
         op_fup_rate = input$numOPOutcomeFup,
-        op_clinic_length = input$numOpClinicLength,
+        op_clinic_slots = input$numOpClinicSlots,
         total_beds = input$numBeds,
         pre_op_los = input$numPreOpLos,
         post_op_los = input$numPostOpLos,

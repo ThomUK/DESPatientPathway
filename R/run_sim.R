@@ -49,7 +49,7 @@ run_sim <- function(model_config) {
     # the dna consumes the same clinic resource as an attendance
     log_("OP: DNA") |>
     set_attribute("OP appt DNA", 1) |>
-    timeout(mc$op_clinic_length / 60 / 24 / 7) |> # minutes to weeks
+    timeout(1 / mc$op_clinic_slots) |>
     release("OP Clinic", 1) |>
     rollback("op_clinic") # rollback to tagged resource
 
@@ -103,7 +103,7 @@ run_sim <- function(model_config) {
     # if no DNA, continue with the OP appointment
     log_("OP: Attended") |>
     set_attribute("OP appt attended", 1) |>
-    timeout(mc$op_clinic_length / 60 / 24 / 7) |> # minutes to weeks
+    timeout(1 / mc$op_clinic_slots) |>
     release("OP Clinic", 1) |>
 
     # branch into admission and discharge
