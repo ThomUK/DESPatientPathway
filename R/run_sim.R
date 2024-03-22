@@ -10,13 +10,13 @@ run_sim <- function(model_config) {
   # read the model config to a short variable name
   mc <- model_config()
 
-  # Time unit  = minutes
+  # Time unit  = weeks
   env <- simmer("pathway")
 
   #### create the distribution functions ####
   ## continuous distributions ##
   # patient arrivals
-  rate <- mc$pat_referral_rate * 12 / 365 / 24 / 60 # monthly -> annual, then calculate patients per minute
+  rate <- mc$pat_referral_rate * 12 / 52 # monthly -> annual, then calculate patients per week
   dist_patient_arrival <- function() rexp(1, rate)
   # dist_patient_arrival()
 
@@ -24,13 +24,13 @@ run_sim <- function(model_config) {
   dist_starting_backlog <- at(rep(0, mc$pat_backlog_size))
   # dist_starting_backlog()
 
-  dist_pre_op_ward_los <- function() rexp(1, 1 / (60 * mc$pre_op_los)) # x60 = hours
+  dist_pre_op_ward_los <- function() rexp(1, 1 / (mc$pre_op_los / 7)) # days to weeks
   # dist_pre_op_ward_los()
 
-  dist_operating_time <- function() rexp(1, 1 / mc$theatre_proc_length) # minutes
+  dist_operating_time <- function() rexp(1, 1 / (mc$theatre_proc_length / 60 / 24 / 7 )) # minutes to weeks
   # dist_operating_time()
 
-  dist_post_op_ward_los <- function() rexp(1, 1 / (60 * 24 * mc$post_op_los)) # 60x24 = days
+  dist_post_op_ward_los <- function() rexp(1, 1 / (mc$post_op_los / 7)) # days to weeks
   # dist_post_op_ward_los()
 
   ## discrete distributions ##
@@ -49,7 +49,7 @@ run_sim <- function(model_config) {
     # the dna consumes the same clinic resource as an attendance
     log_("OP: DNA") |>
     set_attribute("OP appt DNA", 1) |>
-    timeout(mc$op_clinic_length) |>
+    timeout(mc$op_clinic_length / 60 / 24 / 7) |> # minutes to weeks
     release("OP Clinic", 1) |>
     rollback("op_clinic") # rollback to tagged resource
 
@@ -103,7 +103,7 @@ run_sim <- function(model_config) {
     # if no DNA, continue with the OP appointment
     log_("OP: Attended") |>
     set_attribute("OP appt attended", 1) |>
-    timeout(mc$op_clinic_length) |>
+    timeout(mc$op_clinic_length / 60 / 24 / 7) |> # minutes to weeks
     release("OP Clinic", 1) |>
 
     # branch into admission and discharge
@@ -123,7 +123,7 @@ run_sim <- function(model_config) {
     add_generator("backlog patient", patient, dist_starting_backlog, mon = 2) |>
     add_generator("new patient", patient, dist_patient_arrival, mon = 2)
 
-  env |> run(60 * 24 * 7 * mc$forecast_length) # 60 * 24 * 7 = 1 week
+  env |> run(mc$forecast_length)
 
   res <- list(
     sim = sim,

@@ -26,7 +26,7 @@ mod_simulation_ui <- function(id) {
         h4("Model options:"),
         div(
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
-          sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 1, min = 1, max = 104),
+          sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 52, min = 1, max = 208),
         )
       ),
       column(
@@ -45,14 +45,14 @@ mod_simulation_ui <- function(id) {
         h4("Patient pathway config:"),
         div(
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
-          sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 500, min = 0, max = 5000),
+          sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 0, min = 0, max = 5000),
           sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
           sliderInput(NS(id, "numOPDNA"), "OP DNA rate (%)", value = 10, min = 0, max = 100),
           sliderInput(NS(id, "numOPOutcomeFup"), "OP outcome: Book followup (%)", value = 25, min = 0, max = 100),
           sliderInput(NS(id, "numOPOutcomeAdmit"), "OP outcome: Admit (%)", value = 10, min = 0, max = 100),
           uiOutput(NS(id, "OPOutcomeDischarge")), # a shinyjs output
-          sliderInput(NS(id, "numPreOpLos"), "Average pre-operative length of stay (hours)", value = 6, min = 0, max = 36),
-          sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (days)", value = 3, min = 0, max = 42, step = 0.1),
+          sliderInput(NS(id, "numPreOpLos"), "Average pre-operative length of stay (days)", value = 0.2, min = 0, max = 7, step = 0.1),
+          sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (days)", value = 1.8, min = 0, max = 42, step = 0.1),
           sliderInput(NS(id, "numTheatreProcLength"), "Average length of theatre procedures (minutes)", value = 90, min = 5, max = 720),
         )
       )
@@ -222,7 +222,7 @@ mod_simulation_server <- function(id) {
       # make a plot
       output$queuePlot <- renderPlot(
         plot(sim_resources, metric = "usage", items = "queue", steps = TRUE) +
-          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 1 / 60 / 24)) + # format labels to represent days
+          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 7)) + # format labels to represent days
           labs(
             title = "Queue size",
             y = "Number of patients"
@@ -232,7 +232,7 @@ mod_simulation_server <- function(id) {
       )
       output$serverPlot <- renderPlot(
         plot(sim_resources, metric = "usage", items = "server", steps = TRUE) +
-          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 1 / 60 / 24)) + # format labels to represent days
+          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 7)) + # format labels to represent days
           scale_color_manual(values = "lightgreen") +
           labs(
             subtitle = "Dotted line = max capacity, Solid line = actual usage",
