@@ -1,7 +1,9 @@
-# DES Patient Pathway (development version)
+# DES Patient Pathway 0.1.0.9001 (development version)
 
 * Added Outpatient "did not attend" (DNA) rate to the model.
-* Removed the probablity distribution (variation) from OP clinic appointment times.  OP clinics are now assumed to be a regular consistent length (adjustable by the user).
+* changed the simulation step from minutes to weeks, simplifying theatre on outpatient clinic schedule modelling.
+* Modified the method used to specify OP clinic and theatre capacity, from length of appointment, to number of patients per week.  
+* Improved graph visualisations.
 * Added a tab to show this changelog within the app.
 
 ---

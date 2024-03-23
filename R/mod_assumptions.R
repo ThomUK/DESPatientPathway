@@ -21,14 +21,10 @@ mod_assumptions_ui <- function(id) {
       column(
         width = 12,
         h2("Notes"),
-        p("This model is in development.  It is not yet ready to be used for planning.  Some of the issues to be resolved are detailed below."),
+        p("This model is in development.  Potential future improvements are detailed below."),
         HTML(
           "<ul>
-              <li>Is the main queue appearing in the right place?  Is the typical real waiting list post referral and pre OP appointment, or is it post OP appt and pre-admission.</li>
-              <li>How to visualise the queue between OP appt and hospital admission?</li>
-              <li>The ward is modelled as a shared pre and post-operative ward, but the priority and behaviour of post-op vs. pre-op patients needs to be checked.</li>
-              <li>Need to add an additional class of 'priority' patients (eg. cancer) in parallel to the standard patients. Define the queuing behaviour.</li>
-              <li>The OP clinic and Theatre schedules are hard-coded as 8hrs/day, 7days/week.  This needs to be user-configurable.</li>
+              <li>Need to add an additional class of 'priority' patients (eg. cancer) in parallel to the standard patients. Define the demand and queuing behaviours separately for each class of patient.</li>
             </ul>"
         )
       )
@@ -37,10 +33,19 @@ mod_assumptions_ui <- function(id) {
       column(
         12,
         h2("Assumptions"),
-        h3("Probability distributions"),
-        p("Exponential distributions are used to model: Patient arrivals (referral times), ward bed length of stay, and theatre length of procedure."),
-        p("In the case of ward and theatre length of stay, this is for simplicity.  A log-normal or similar distribution may fit better, but would require tuning of 2 parameters to fit."),
-        p("There is no probability distribution modelled for OP clinic lengths.  These are assumed to be fixed and regular timings.")
+        h3("Working patterns"),
+        p("The simulation runs on a weekly pattern.  It does not account for holidays, cancelled clinics, or cancelled theatre procedures.  These inefficiencies should be included in the numbers selected by the users.  For example:"),
+        HTML(
+          "<ul>
+              <li>If the OP schedule allows for 30 patients weekly, but historically 10% of clinic slots are cancelled due to consultant holiday, the number of slots input to this model should be 27.
+              </li>
+              <li>Similarly, if there are nominally 10 operating theatre patient slots, but historic theatre session utilisation is 80%, only 8 slots should be specificed in this model. 
+              </li>
+          </ul>"
+        ),
+        h3("Probability distributions and randomness"),
+        p("Exponential distribution are used to model the patient arrivals (referral times).  This intentionally introduces randomness into the model, and is the reason that repeat runs do not give identical results."),
+        p("The decision points (ie. the outcome of the clinic appointment), are also randomly sampled, introducing further randomness.  The overall proportion of decisions match those specificd by the user in the user interface.  ")
       )
     ),
   )
