@@ -57,6 +57,7 @@ run_sim <- function(model_config) {
   branch_followup_later <- trajectory("book OP followup") |>
     log_("OP outcome: Follow-up later") |>
     set_attribute("OP outcome: followup booked", 1) |>
+    timeout(4) |> # followup in 4 weeks
     rollback("op_clinic") # rollback to tagged resource
 
   branch_admit <- trajectory("admit for treatment") |>

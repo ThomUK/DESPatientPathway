@@ -45,7 +45,8 @@ mod_assumptions_ui <- function(id) {
         ),
         h3("Probability distributions and randomness"),
         p("Exponential distribution are used to model the patient arrivals (referral times).  This intentionally introduces randomness into the model, and is the reason that repeat runs do not give identical results."),
-        p("The decision points (ie. the outcome of the clinic appointment), are also randomly sampled, introducing further randomness.  The overall proportion of decisions match those specificd by the user in the user interface.  ")
+        p("The decision points (ie. the outcome of the clinic appointment), are also randomly sampled, introducing further randomness.  The overall proportion of decisions match those specificd by the user in the user interface.  "),
+        p("Followups are rebooked (re-join the queue) in 4 weeks.  Randomness could be added here if desired.  ")
       )
     ),
   )
