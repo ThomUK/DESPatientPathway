@@ -81,10 +81,13 @@ mod_simulation_ui <- function(id) {
       12,
       hr(),
       plotOutput(NS(id, "queuePlot")),
+      textOutput(NS(id, "configDetails1")),
       hr(),
       plotOutput(NS(id, "serverPlot")),
+      textOutput(NS(id, "configDetails2")),
       hr(),
       plotOutput(NS(id, "utilisationPlot")),
+      textOutput(NS(id, "configDetails3")),
       hr(),
       h4("Simulation results:"),
       p("This table shows the simulation results patient by patient.  Use the search box to search for an event, or a patient."),
@@ -129,17 +132,17 @@ mod_simulation_server <- function(id) {
     # prepare the config object
     model_config <- reactive(
       list(
-        forecast_length = input$numForecastLength,
         pat_referral_rate = input$numPatReferralRate,
         pat_backlog_size = input$numPatBacklogSize,
+        op_clinic_slots = input$numOpClinicSlots,
+        theatre_slots = input$numTheatreSlots,
+        total_beds = input$numBeds,
         op_dna_rate = input$numOPDNA,
         op_admit_rate = input$numOPOutcomeAdmit,
         op_fup_rate = input$numOPOutcomeFup,
-        op_clinic_slots = input$numOpClinicSlots,
-        total_beds = input$numBeds,
         pre_op_los = input$numPreOpLos,
         post_op_los = input$numPostOpLos,
-        theatre_slots = input$numTheatreSlots
+        forecast_length = input$numForecastLength
       )
     )
 
@@ -246,6 +249,32 @@ mod_simulation_server <- function(id) {
           Day = round(Week * 7, 2),
           .after = "Week"
         )
+
+      # rename the config details to be human-readable, then collapse them into a string
+      config_details <- listr::list_rename(
+        model_config(),
+        `Patient referrals (per month)` = pat_referral_rate,
+        `Patient backlog size` = pat_backlog_size,
+        `OP clinic slots (patients per week)` = op_clinic_slots,
+        `Theatre slots (patients per week)` = theatre_slots,
+        `Number of beds` = total_beds,
+        `OP DNA rate (%)` = op_dna_rate,
+        `OP admission rate (%)` = op_admit_rate,
+        `OP followup rate (%)` = op_fup_rate,
+        `Pre-op LOS (days)` = pre_op_los,
+        `Post-op LOS (days)` = post_op_los,
+        `Simulation length (weeks)` = forecast_length
+      )
+      config_details <- paste(
+          names(config_details),
+          config_details,
+          sep = ": ",
+          collapse = ", "
+        )
+
+      # create a text summary of the model config
+      # needs to store in 3 objects to avoid multiple html elements with same ID
+      output$configDetails1 <- output$configDetails2 <- output$configDetails3 <- renderText(config_details)
 
       # make a plot
       output$queuePlot <- renderPlot(
