@@ -129,17 +129,17 @@ mod_simulation_server <- function(id) {
     # prepare the config object
     model_config <- reactive(
       list(
-        forecast_length = input$numForecastLength,
         pat_referral_rate = input$numPatReferralRate,
         pat_backlog_size = input$numPatBacklogSize,
+        op_clinic_slots = input$numOpClinicSlots,
+        theatre_slots = input$numTheatreSlots,
+        total_beds = input$numBeds,
         op_dna_rate = input$numOPDNA,
         op_admit_rate = input$numOPOutcomeAdmit,
         op_fup_rate = input$numOPOutcomeFup,
-        op_clinic_slots = input$numOpClinicSlots,
-        total_beds = input$numBeds,
         pre_op_los = input$numPreOpLos,
         post_op_los = input$numPostOpLos,
-        theatre_slots = input$numTheatreSlots
+        forecast_length = input$numForecastLength
       )
     )
 
