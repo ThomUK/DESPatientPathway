@@ -45,43 +45,43 @@ run_sim <- function(model_config) {
   branch_op_dna <- trajectory("op did not attend") |>
     # the dna consumes the same clinic resource as an attendance
     log_("OP: DNA") |>
-    set_attribute("OP appt DNA", 1) |>
+    set_attribute("OP appt DNA, patient rebooked", 1) |>
     timeout(1 / mc$op_clinic_slots) |>
     release("OP Clinic", 1) |>
     rollback("op_clinic") # rollback to tagged resource
 
   branch_discharge_from_op <- trajectory("discharged from OP appt") |>
     log_("OP outcome: Discharge") |>
-    set_attribute("discharged home", 1)
+    set_attribute("OP outcome: discharged home", 1)
 
   branch_followup_later <- trajectory("book OP followup") |>
     log_("OP outcome: Follow-up later") |>
-    set_attribute("OP_fup_booked", 1) |>
+    set_attribute("OP outcome: followup booked", 1) |>
     rollback("op_clinic") # rollback to tagged resource
 
   branch_admit <- trajectory("admit for treatment") |>
     log_("OP outcome: Admit") |>
-    set_attribute("admitted_for_treatment", 1) |>
+    set_attribute("OP outcome: admit for treatment", 1) |>
     # take a pre-op bed
     seize("Bed") |>
     log_("Pre-op bed") |>
-    set_attribute("moved_to_pre_op_bed", 1) |>
+    set_attribute("IP moved to pre-op bed", 1) |>
     timeout(dist_pre_op_ward_los) |>
     release("Bed") |>
     # operate
     seize("Theatre") |>
     log_("Theatre") |>
-    set_attribute("moved_to_theatre", 1) |>
+    set_attribute("IP moved to theatre", 1) |>
     timeout(1 / mc$theatre_slots) |>
     release("Theatre") |>
     # take a recovery ward bed
     seize("Bed") |>
     log_("Post-op bed") |>
-    set_attribute("moved_to_post_op_bed", 1) |>
+    set_attribute("IP moved to post-op bed", 1) |>
     timeout(dist_post_op_ward_los) |>
     release("Bed") |>
     log_("IP discharged") |>
-    set_attribute("discharged home", 1)
+    set_attribute("IP discharged home", 1)
 
 
   # create the overall patient pathway
