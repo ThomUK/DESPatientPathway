@@ -86,6 +86,10 @@ mod_simulation_ui <- function(id) {
       hr(),
       plotOutput(NS(id, "utilisationPlot")),
       hr(),
+      h4("Simulation results:"),
+      p("This table shows the simulation results patient by patient.  Use the search box to search for an event, or a patient."),
+      dataTableOutput(NS(id, "attributesTable")),
+      hr(),
       h4("Patient pathway:"),
       DiagrammeR::grVizOutput(NS(id, "trajectoryPlot"), height = "2000px"),
       hr()
@@ -231,6 +235,18 @@ mod_simulation_server <- function(id) {
           resource = factor(resource, levels = c("OP Clinic", "Theatre", "Bed"))
         )
 
+      sim_attributes <- sim |>
+        get_mon_attributes() |>
+        dplyr::select(
+          Week = time,
+          Patient = name,
+          Event = key
+        ) |>
+        dplyr::mutate(
+          Day = round(Week * 7, 2),
+          .after = "Week"
+        )
+
       # make a plot
       output$queuePlot <- renderPlot(
         ggplot2::ggplot(sim_resources, ggplot2::aes(time, queue)) +
@@ -268,6 +284,7 @@ mod_simulation_server <- function(id) {
           ) +
           theme_minimal(base_size = 16)
       )
+      output$attributesTable <- renderDataTable(sim_attributes)
       output$trajectoryPlot <- DiagrammeR::renderGrViz(
         plot(patient, verbose = TRUE)
       )
