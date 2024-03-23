@@ -226,17 +226,21 @@ mod_simulation_server <- function(id) {
       # compute some stats
       sim_resources <- sim |>
         get_mon_resources() |>
+        # specify factor levels so that the facet plot ordering is correct
         dplyr::mutate(
           resource = factor(resource, levels = c("OP Clinic", "Theatre", "Bed"))
         )
 
       # make a plot
       output$queuePlot <- renderPlot(
-        plot(sim_resources, metric = "usage", items = "queue", steps = TRUE) +
-          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 7)) + # format labels to represent days
+        ggplot2::ggplot(sim_resources, ggplot2::aes(time, queue)) +
+            ggplot2::geom_line(colour = "firebrick", alpha = 0.7) +
+            ggplot2::facet_wrap(ggplot2::vars(resource), scale = "free_y") +
           labs(
-            title = "Queue size",
-            y = "Number of patients"
+            title = "Queue sizes for each resource",
+            subtitle = "Are the queue sizes stable?  Do backlogs build up or reduce over time?",
+            x = "Weeks",
+            y = "Number of queueing patients"
           ) +
           theme_minimal(base_size = 16) +
           theme(legend.position = "none")
