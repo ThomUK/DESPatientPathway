@@ -117,8 +117,8 @@ run_sim <- function(model_config) {
     add_resource("OP Clinic", capacity = 1) |>
     add_resource("Bed", mc$total_beds) |>
     add_resource("Theatre", capacity = 1) |>
-    add_generator("backlog patient", patient, dist_starting_backlog, mon = 2) |>
-    add_generator("new patient", patient, dist_patient_arrival, mon = 2)
+    add_generator("backlog patient ", patient, dist_starting_backlog, mon = 2) |>
+    add_generator("new patient ", patient, dist_patient_arrival, mon = 2)
 
   env |> run(mc$forecast_length)
 

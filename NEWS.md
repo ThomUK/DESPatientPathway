@@ -5,6 +5,7 @@
 * Modified the method used to specify OP clinic and theatre capacity, from length of appointment, to number of patients per week.  
 * Improved graph visualisations.
 * Added a tab to show this changelog within the app.
+* Added a table to visualise simulation results step by step.
 
 ---
 
