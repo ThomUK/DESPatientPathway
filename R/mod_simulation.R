@@ -81,10 +81,13 @@ mod_simulation_ui <- function(id) {
       12,
       hr(),
       plotOutput(NS(id, "queuePlot")),
+      textOutput(NS(id, "configDetails1")),
       hr(),
       plotOutput(NS(id, "serverPlot")),
+      textOutput(NS(id, "configDetails2")),
       hr(),
       plotOutput(NS(id, "utilisationPlot")),
+      textOutput(NS(id, "configDetails3")),
       hr(),
       h4("Simulation results:"),
       p("This table shows the simulation results patient by patient.  Use the search box to search for an event, or a patient."),
@@ -268,6 +271,11 @@ mod_simulation_server <- function(id) {
           sep = ": ",
           collapse = ", "
         )
+
+      # create a text summary of the model config
+      # needs to store in 3 objects to avoid multiple html elements with same ID
+      output$configDetails1 <- output$configDetails2 <- output$configDetails3 <- renderText(config_details)
+
       # make a plot
       output$queuePlot <- renderPlot(
         ggplot2::ggplot(sim_resources, ggplot2::aes(time, queue)) +
