@@ -23,18 +23,22 @@ mod_simulation_ui <- function(id) {
     fluidRow(
       column(
         width = 6,
-        h4("Model options:"),
-        div(
-          style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
-          sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 1, min = 1, max = 104),
-        )
-      ),
-      column(
-        width = 6,
-        h4("Service config:"),
+        h4("Demand:"),
         div(
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px; margin-top: 5px;",
-          sliderInput(NS(id, "numOpClinicLength"), "Length of an OP clinic (minutes)", value = 30, min = 5, max = 120),
+          sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
+          sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 0, min = 0, max = 5000),
+        )
+      )
+    ),
+    fluidRow(
+      column(
+        width = 6,
+        h4("Capacity:"),
+        div(
+          style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px; margin-top: 5px;",
+          sliderInput(NS(id, "numOpClinicSlots"), "Number of OP clinic slots (patients per week)", value = 25, min = 0, max = 1400),
+          sliderInput(NS(id, "numTheatreSlots"), "Number of theatre slots (patients per week)", value = 4, min = 0, max = 200),
           numericInput(NS(id, "numBeds"), "Total beds (pre & post-operative combined)", value = 6, min = 1, max = 36),
         )
       )
@@ -42,18 +46,25 @@ mod_simulation_ui <- function(id) {
     fluidRow(
       column(
         width = 6,
-        h4("Patient pathway config:"),
+        h4("Service performance:"),
         div(
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
-          sliderInput(NS(id, "numPatBacklogSize"), "Number of existing patients in the OP clinic backlog", value = 500, min = 0, max = 5000),
-          sliderInput(NS(id, "numPatReferralRate"), "Number of new patient referrals (monthly)", value = 100, min = 0, max = 1000),
           sliderInput(NS(id, "numOPDNA"), "OP DNA rate (%)", value = 10, min = 0, max = 100),
           sliderInput(NS(id, "numOPOutcomeFup"), "OP outcome: Book followup (%)", value = 25, min = 0, max = 100),
           sliderInput(NS(id, "numOPOutcomeAdmit"), "OP outcome: Admit (%)", value = 10, min = 0, max = 100),
           uiOutput(NS(id, "OPOutcomeDischarge")), # a shinyjs output
-          sliderInput(NS(id, "numPreOpLos"), "Average pre-operative length of stay (hours)", value = 6, min = 0, max = 36),
-          sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (days)", value = 3, min = 0, max = 42, step = 0.1),
-          sliderInput(NS(id, "numTheatreProcLength"), "Average length of theatre procedures (minutes)", value = 90, min = 5, max = 720),
+          sliderInput(NS(id, "numPreOpLos"), "Average pre-operative length of stay (days)", value = 0.2, min = 0, max = 7, step = 0.1),
+          sliderInput(NS(id, "numPostOpLos"), "Average post-operative length of stay (days)", value = 1.8, min = 0, max = 42, step = 0.1)
+        )
+      )
+    ),
+    fluidRow(
+      column(
+        width = 6,
+        h4("Model options:"),
+        div(
+          style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
+          sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 52, min = 1, max = 208),
         )
       )
     ),
@@ -120,11 +131,11 @@ mod_simulation_server <- function(id) {
         op_dna_rate = input$numOPDNA,
         op_admit_rate = input$numOPOutcomeAdmit,
         op_fup_rate = input$numOPOutcomeFup,
-        op_clinic_length = input$numOpClinicLength,
+        op_clinic_slots = input$numOpClinicSlots,
         total_beds = input$numBeds,
         pre_op_los = input$numPreOpLos,
         post_op_los = input$numPostOpLos,
-        theatre_proc_length = input$numTheatreProcLength
+        theatre_slots = input$numTheatreSlots
       )
     )
 
@@ -215,28 +226,35 @@ mod_simulation_server <- function(id) {
       # compute some stats
       sim_resources <- sim |>
         get_mon_resources() |>
+        # specify factor levels so that the facet plot ordering is correct
         dplyr::mutate(
           resource = factor(resource, levels = c("OP Clinic", "Theatre", "Bed"))
         )
 
       # make a plot
       output$queuePlot <- renderPlot(
-        plot(sim_resources, metric = "usage", items = "queue", steps = TRUE) +
-          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 1 / 60 / 24)) + # format labels to represent days
+        ggplot2::ggplot(sim_resources, ggplot2::aes(time, queue)) +
+            ggplot2::geom_line(colour = "firebrick", alpha = 0.7) +
+            ggplot2::facet_wrap(ggplot2::vars(resource), scale = "free_y") +
           labs(
-            title = "Queue size",
-            y = "Number of patients"
+            title = "Queue sizes for each resource",
+            subtitle = "Are the queue sizes stable?  Do backlogs build up or reduce over time?",
+            x = "Weeks",
+            y = "Number of queueing patients"
           ) +
           theme_minimal(base_size = 16) +
           theme(legend.position = "none")
       )
       output$serverPlot <- renderPlot(
-        plot(sim_resources, metric = "usage", items = "server", steps = TRUE) +
-          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 1 / 60 / 24)) + # format labels to represent days
-          scale_color_manual(values = "lightgreen") +
+        ggplot(sim_resources, aes(time)) +
+          geom_line(aes(y = capacity), colour = "firebrick", alpha = 0.7, size = 2, linetype = "43") +
+          geom_line(aes(y = server), colour = "lightgreen", alpha = 0.9, size = 0.5) +
+          facet_wrap(vars(resource), scales = "free_y") +
           labs(
-            subtitle = "Dotted line = max capacity, Solid line = actual usage",
-            y = "Used"
+            title = "Resource usage",
+            subtitle = "Red line = capacity, Green line = actual usage",
+            x = "Weeks",
+            y = "Resource units used (number of clinics, beds, etc)"
           ) +
           theme_minimal(base_size = 16) +
           theme(legend.position = "none")

@@ -10,16 +10,17 @@ source("R/run_sim.R")
 # prepare the config object
 model_config <- function(){
   list(
-    forecast_length = 30,
+    forecast_length = 52,
     pat_referral_rate = 100,
-    pat_backlog_size = 500,
-    op_conversion_rate = 0.1,
+    pat_backlog_size = 0,
+    op_dna_rate = 0.1,
+    op_admit_rate = 0.2,
     op_fup_rate = 0.25,
-    op_clinic_length = 30,
+    op_clinic_slots = 100,
     total_beds = 4,
-    pre_op_los = 6,
-    post_op_los = 36,
-    theatre_proc_length = 90
+    pre_op_los = 0.2,
+    post_op_los = 1.8,
+    theatre_slots = 4
   )
 }
 
