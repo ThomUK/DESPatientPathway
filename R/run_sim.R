@@ -116,7 +116,7 @@ run_sim <- function(model_config) {
   sim <- env |>
     add_resource("OP Clinic", capacity = 1, mon = 2) |>
     add_resource("Bed", mc$total_beds, mon = 2) |>
-    add_resource("Theatre", capacity = 1, queue_size = 0, mon = 2) |>
+    add_resource("Theatre", capacity = 1, mon = 2) |>
     add_generator("backlog patient", patient, dist_starting_backlog, mon = 2) |>
     add_generator("new patient", patient, dist_patient_arrival, mon = 2)
 
