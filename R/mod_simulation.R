@@ -246,12 +246,15 @@ mod_simulation_server <- function(id) {
           theme(legend.position = "none")
       )
       output$serverPlot <- renderPlot(
-        plot(sim_resources, metric = "usage", items = "server", steps = TRUE) +
-          scale_x_continuous(name = "Days", labels = scales::number_format(scale = 7)) + # format labels to represent days
-          scale_color_manual(values = "lightgreen") +
+        ggplot(sim_resources, aes(time)) +
+          geom_line(aes(y = capacity), colour = "firebrick", alpha = 0.7, size = 2, linetype = "43") +
+          geom_line(aes(y = server), colour = "lightgreen", alpha = 0.9, size = 0.5) +
+          facet_wrap(vars(resource), scales = "free_y") +
           labs(
-            subtitle = "Dotted line = max capacity, Solid line = actual usage",
-            y = "Used"
+            title = "Resource usage",
+            subtitle = "Red line = capacity, Green line = actual usage",
+            x = "Weeks",
+            y = "Resource units used (number of clinics, beds, etc)"
           ) +
           theme_minimal(base_size = 16) +
           theme(legend.position = "none")
