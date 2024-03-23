@@ -247,6 +247,27 @@ mod_simulation_server <- function(id) {
           .after = "Week"
         )
 
+      # rename the config details to be human-readable, then collapse them into a string
+      config_details <- listr::list_rename(
+        model_config(),
+        `Patient referrals (per month)` = pat_referral_rate,
+        `Patient backlog size` = pat_backlog_size,
+        `OP clinic slots (patients per week)` = op_clinic_slots,
+        `Theatre slots (patients per week)` = theatre_slots,
+        `Number of beds` = total_beds,
+        `OP DNA rate (%)` = op_dna_rate,
+        `OP admission rate (%)` = op_admit_rate,
+        `OP followup rate (%)` = op_fup_rate,
+        `Pre-op LOS (days)` = pre_op_los,
+        `Post-op LOS (days)` = post_op_los,
+        `Simulation length (weeks)` = forecast_length
+      )
+      config_details <- paste(
+          names(config_details),
+          config_details,
+          sep = ": ",
+          collapse = ", "
+        )
       # make a plot
       output$queuePlot <- renderPlot(
         ggplot2::ggplot(sim_resources, ggplot2::aes(time, queue)) +
