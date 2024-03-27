@@ -228,7 +228,7 @@ mod_simulation_server <- function(id) {
 
       # extract data from the result object
       sim <- res$sim
-      patient <- res$patient
+      patient_trajectory <- res$patient_trajectory
 
       # compute some stats
       sim_resources <- sim |>
@@ -315,7 +315,7 @@ mod_simulation_server <- function(id) {
       )
       output$attributesTable <- renderDataTable(sim_attributes)
       output$trajectoryPlot <- DiagrammeR::renderGrViz(
-        plot(patient, verbose = TRUE)
+        plot(patient_trajectory, verbose = TRUE)
       )
     })
   })

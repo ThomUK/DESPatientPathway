@@ -86,7 +86,7 @@ run_sim <- function(model_config) {
 
 
   # create the overall patient pathway
-  patient <- trajectory("patient pathway") |>
+  patient_trajectory <- trajectory("patient pathway") |>
     #  log_("Referred in") |>
     ## add an intake activity
     seize("OP Clinic", 1, tag = "op_clinic") |>
@@ -118,14 +118,14 @@ run_sim <- function(model_config) {
     add_resource("OP Clinic", capacity = 1) |>
     add_resource("Bed", mc$total_beds) |>
     add_resource("Theatre", capacity = 1) |>
-    add_generator("backlog patient ", patient, dist_starting_backlog, mon = 2) |>
-    add_generator("new patient ", patient, dist_patient_arrival, mon = 2)
+    add_generator("backlog patient ", patient_trajectory, dist_starting_backlog, mon = 2) |>
+    add_generator("new patient ", patient_trajectory, dist_patient_arrival, mon = 2)
 
   env |> run(mc$forecast_length)
 
   res <- list(
     sim = sim,
-    patient = patient
+    patient_trajectory = patient_trajectory
   )
   return(res)
 }
