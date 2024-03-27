@@ -9,6 +9,7 @@ Imports:
     DiagrammeR,
     ggplot2,
     golem (>= 0.4.1),
+    listr,
     pkgload,
     scales,
     shiny (>= 1.7.4),
