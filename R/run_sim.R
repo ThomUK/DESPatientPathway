@@ -11,7 +11,7 @@ run_sim <- function(model_config) {
   mc <- model_config()
 
   # Time unit  = weeks
-  env <- simmer("pathway")
+  env <- simmer::simmer("pathway")
 
   #### create the distribution functions ####
   ## continuous distributions ##
@@ -21,7 +21,7 @@ run_sim <- function(model_config) {
   # dist_patient_arrival()
 
   # initial backlog of patients
-  dist_starting_backlog <- at(rep(0, mc$pat_backlog_size))
+  dist_starting_backlog <- simmer::at(rep(0, mc$pat_backlog_size))
   # dist_starting_backlog()
 
   dist_pre_op_ward_los <- function() rexp(1, 1 / (mc$pre_op_los / 7)) # days to weeks
@@ -42,70 +42,70 @@ run_sim <- function(model_config) {
   # dist_op_outcome()
 
   # create the patient pathway branches
-  branch_op_dna <- trajectory("op did not attend") |>
+  branch_op_dna <- simmer::trajectory("op did not attend") |>
     # the dna consumes the same clinic resource as an attendance
-    log_("OP: DNA") |>
-    set_attribute("OP appt DNA, patient rebooked", 1) |>
-    timeout(1 / mc$op_clinic_slots) |>
-    release("OP Clinic", 1) |>
-    rollback("op_clinic") # rollback to tagged resource
+    simmer::log_("OP: DNA") |>
+    simmer::set_attribute("OP appt DNA, patient rebooked", 1) |>
+    simmer::timeout(1 / mc$op_clinic_slots) |>
+    simmer::release("OP Clinic", 1) |>
+    simmer::rollback("op_clinic") # rollback to tagged resource
 
-  branch_discharge_from_op <- trajectory("discharged from OP appt") |>
-    log_("OP outcome: Discharge") |>
-    set_attribute("OP outcome: discharged home", 1)
+  branch_discharge_from_op <- simmer::trajectory("discharged from OP appt") |>
+    simmer::log_("OP outcome: Discharge") |>
+    simmer::set_attribute("OP outcome: discharged home", 1)
 
-  branch_followup_later <- trajectory("book OP followup") |>
-    log_("OP outcome: Follow-up later") |>
-    set_attribute("OP outcome: followup booked", 1) |>
-    timeout(4) |> # followup in 4 weeks
-    rollback("op_clinic") # rollback to tagged resource
+  branch_followup_later <- simmer::trajectory("book OP followup") |>
+    simmer::log_("OP outcome: Follow-up later") |>
+    simmer::set_attribute("OP outcome: followup booked", 1) |>
+    simmer::timeout(4) |> # followup in 4 weeks
+    simmer::rollback("op_clinic") # rollback to tagged resource
 
-  branch_admit <- trajectory("admit for treatment") |>
-    log_("OP outcome: Admit") |>
-    set_attribute("OP outcome: admit for treatment", 1) |>
+  branch_admit <- simmer::trajectory("admit for treatment") |>
+    simmer::log_("OP outcome: Admit") |>
+    simmer::set_attribute("OP outcome: admit for treatment", 1) |>
     # take a pre-op bed
-    seize("Bed") |>
-    log_("Pre-op bed") |>
-    set_attribute("IP moved to pre-op bed", 1) |>
-    timeout(dist_pre_op_ward_los) |>
-    release("Bed") |>
+    simmer::seize("Bed") |>
+    simmer::log_("Pre-op bed") |>
+    simmer::set_attribute("IP moved to pre-op bed", 1) |>
+    simmer::timeout(dist_pre_op_ward_los) |>
+    simmer::release("Bed") |>
     # operate
-    seize("Theatre") |>
-    log_("Theatre") |>
-    set_attribute("IP moved to theatre", 1) |>
-    timeout(1 / mc$theatre_slots) |>
-    release("Theatre") |>
+    simmer::seize("Theatre") |>
+    simmer::log_("Theatre") |>
+    simmer::set_attribute("IP moved to theatre", 1) |>
+    simmer::timeout(1 / mc$theatre_slots) |>
+    simmer::release("Theatre") |>
     # take a recovery ward bed
-    seize("Bed") |>
-    log_("Post-op bed") |>
-    set_attribute("IP moved to post-op bed", 1) |>
-    timeout(dist_post_op_ward_los) |>
-    release("Bed") |>
-    log_("IP discharged") |>
-    set_attribute("IP discharged home", 1)
+    simmer::seize("Bed") |>
+    simmer::log_("Post-op bed") |>
+    simmer::set_attribute("IP moved to post-op bed", 1) |>
+    simmer::timeout(dist_post_op_ward_los) |>
+    simmer::release("Bed") |>
+    simmer::log_("IP discharged") |>
+    simmer::set_attribute("IP discharged home", 1)
 
 
   # create the overall patient pathway
-  patient_trajectory <- trajectory("patient pathway") |>
+  patient_trajectory <- simmer::trajectory("patient pathway") |>
     #  log_("Referred in") |>
     ## add an intake activity
-    seize("OP Clinic", 1, tag = "op_clinic") |>
+    simmer::seize("OP Clinic", 1, tag = "op_clinic") |>
 
     # create a branch to model OP DNAs
-    branch(
+    simmer::branch(
       dist_op_dna,
       continue = FALSE,
       branch_op_dna
     ) |>
 
     # if no DNA, continue with the OP appointment
-    log_("OP: Attended") |>
-    set_attribute("OP appt attended", 1) |>
-    timeout(1 / mc$op_clinic_slots) |>
-    release("OP Clinic", 1) |>
+    simmer::log_("OP: Attended") |>
+    simmer::set_attribute("OP appt attended", 1) |>
+    simmer::timeout(1 / mc$op_clinic_slots) |>
+    simmer::release("OP Clinic", 1) |>
 
     # branch into admission and discharge
-    branch(
+    simmer::branch(
       dist_op_outcome,
       continue = FALSE,
       branch_admit,
@@ -115,13 +115,13 @@ run_sim <- function(model_config) {
 
 
   sim <- env |>
-    add_resource("OP Clinic", capacity = 1) |>
-    add_resource("Bed", mc$total_beds) |>
-    add_resource("Theatre", capacity = 1) |>
-    add_generator("backlog patient ", patient_trajectory, dist_starting_backlog, mon = 2) |>
-    add_generator("new patient ", patient_trajectory, dist_patient_arrival, mon = 2)
+    simmer::add_resource("OP Clinic", capacity = 1) |>
+    simmer::add_resource("Bed", mc$total_beds) |>
+    simmer::add_resource("Theatre", capacity = 1) |>
+    simmer::add_generator("backlog patient ", patient_trajectory, dist_starting_backlog, mon = 2) |>
+    simmer::add_generator("new patient ", patient_trajectory, dist_patient_arrival, mon = 2)
 
-  env |> run(mc$forecast_length)
+  env |> simmer::run(mc$forecast_length)
 
   res <- list(
     sim = sim,
