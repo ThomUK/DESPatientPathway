@@ -1,4 +1,6 @@
-# DES Patient Pathway 0.1.0.9001 (development version)
+# DES Patient Pathway
+
+## v0.2.0
 
 * Added Outpatient "did not attend" (DNA) rate to the model.
 * changed the simulation step from minutes to weeks, simplifying theatre on outpatient clinic schedule modelling.
@@ -9,6 +11,8 @@
 
 ---
 
-# DES Patient Pathway 0.1.0
+# DES Patient Pathway 
+
+## v0.1.0
 
 * Initial release.
