@@ -7,7 +7,7 @@
 #' @return List. A list of sim outputs, one for each replication
 #' @export
 #'
-run_multi_sim <- function(n, model_config){
+run_multi_sim <- function(model_config, n){
 
   purrr::map(1:n, \(x) run_sim(model_config))
 
