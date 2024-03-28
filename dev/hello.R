@@ -2,10 +2,30 @@
 #library(simmer)
 #library(simmer.plot)
 
-source("R/run_sim.R")
+#########################################################
+## RUNNING MULTIPLE REPLICATIONS OF MULTIPLE SCENARIOS ##
+#########################################################
 
-#set.seed(NULL)
-#set.seed(1)
+# create a scenarios dataframe
+scenarios <- tibble::tribble(
+  ~ scenario_no, ~specialty, ~comment, ~forecast_length, ~pat_referral_rate, ~pat_backlog_size, ~op_dna_rate, ~op_admit_rate, ~op_fup_rate, ~op_clinic_slots, ~total_beds, ~pre_op_los, ~post_op_los, ~theatre_slots,
+  1, "Specialty A", "No backlog", 52, 100, 0, 0.1, 0.1, 0.25, 100, 4, 0.2, 1.8, 4,
+  2, "Specialty A", "Including backlog", 52, 100, 1000, 0.1, 0.1, 0.25, 100, 4, 0.2, 1.8, 4,
+  3, "Specialty B", "+ referrals, including backlog", 52, 150, 1000, 0.1, 0.1, 0.25, 100, 4, 0.2, 1.8, 4,
+)
+
+# run multiple scenarios, through multiple replications
+result <- simulate_worlds(scenarios, 5)
+
+
+simmer.plot::plot()
+arr <- res |>
+  simmer::get_mon_arrivals()
+
+
+#####################################
+## RUNNING A SINGLE SCENARIO ########
+#####################################
 
 # prepare the config object
 model_config <- function(){
