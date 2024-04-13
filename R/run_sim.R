@@ -10,9 +10,6 @@ run_sim <- function(model_config) {
   # read the model config to a short variable name
   mc <- model_config()
 
-  # Time unit  = weeks
-  env <- simmer("pathway")
-
   #### create the distribution functions ####
   ## continuous distributions ##
   # patient arrivals
@@ -113,19 +110,26 @@ run_sim <- function(model_config) {
       branch_discharge_from_op
     )
 
+  #env |> run(mc$forecast_length)
 
-  sim <- env |>
-    add_resource("OP Clinic", capacity = 1) |>
-    add_resource("Bed", mc$total_beds) |>
-    add_resource("Theatre", capacity = 1) |>
-    add_generator("backlog patient ", patient, dist_starting_backlog, mon = 2) |>
-    add_generator("new patient ", patient, dist_patient_arrival, mon = 2)
+  num_cores <- parallel::detectCores() - 1
+  print(glue::glue("Using {num_cores} cores"))
+  # Need option to make this dynamic
+  # Might want to use set.seed for testing purposes
+  envs <- parallel::mclapply(1:mc$num_simulations, function(i) {
+    print(i)
+    sim <- simmer("pathway") |>
+      add_resource("OP Clinic", capacity = 1) |>
+      add_resource("Bed", mc$total_beds) |>
+      add_resource("Theatre", capacity = 1) |>
+      add_generator("backlog patient ", patient, dist_starting_backlog, mon = 2) |>
+      add_generator("new patient ", patient, dist_patient_arrival, mon = 2) |>
+      run(mc$forecast_length) |>
+      wrap()
+  }, mc.cores = num_cores)
 
-  env |> run(mc$forecast_length)
-
-  res <- list(
-    sim = sim,
+  return(list(
+    sim = envs,
     patient = patient
-  )
-  return(res)
+  ))
 }
