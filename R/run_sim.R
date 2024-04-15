@@ -112,7 +112,12 @@ run_sim <- function(model_config) {
 
   #env |> run(mc$forecast_length)
 
-  num_cores <- parallel::detectCores() - 1
+  # windows machines can only use a single core
+  if(Sys.info()[['sysname']] == "Windows"){
+    num_cores <- 1
+  } else{
+    num_cores <- parallel::detectCores() - 1
+  }
   print(glue::glue("Using {num_cores} cores"))
   # Need option to make this dynamic
   # Might want to use set.seed for testing purposes
