@@ -65,6 +65,7 @@ mod_simulation_ui <- function(id) {
         div(
           style = "border: 2px solid #ddd; border-radius: 5px; padding: 10px;",
           sliderInput(NS(id, "numForecastLength"), "Future period to forecast (weeks)", value = 52, min = 1, max = 208),
+          sliderInput(NS(id, "numSimulations"), "Number of simulations to run", value = 5, min = 1, max = 100),
         )
       )
     ),
@@ -142,7 +143,8 @@ mod_simulation_server <- function(id) {
         op_fup_rate = input$numOPOutcomeFup,
         pre_op_los = input$numPreOpLos,
         post_op_los = input$numPostOpLos,
-        forecast_length = input$numForecastLength
+        forecast_length = input$numForecastLength,
+        num_simulations = input$numSimulations
       )
     )
 
@@ -231,19 +233,36 @@ mod_simulation_server <- function(id) {
       patient <- res$patient
 
       # compute some stats
-      sim_resources <- sim |>
-        get_mon_resources() |>
-        # specify factor levels so that the facet plot ordering is correct
+      sim_resources <- res$sim |> get_mon_resources() |>
+        dplyr::mutate(
+          time = floor(time)
+        ) |>
+        dplyr::group_by(resource, time) |>
+        dplyr::summarise(
+          # Queue calculations incl 95%CI
+          sample.se = sd(queue, na.rm = T)/sqrt(dplyr::n()),
+          t.score = qt(p=0.05/2, df=dplyr::n() - 1, lower.tail=F),
+          margin.error = t.score * sample.se,
+          queue = mean(queue, na.rm = T),
+          queue_upper_ci = queue + margin.error,
+          queue_lower_ci = queue - margin.error,
+
+          # Resource usage
+          capacity = mean(capacity),
+          server = mean(server)
+
+        ) |> dplyr::ungroup() |>
         dplyr::mutate(
           resource = factor(resource, levels = c("OP Clinic", "Theatre", "Bed"))
-        )
+        ) #|> pivot_longer(cols = c(queue, upper_ci, lower_ci), names_to = "names", values_to = "values")
 
       sim_attributes <- sim |>
         get_mon_attributes() |>
         dplyr::select(
           Week = time,
           Patient = name,
-          Event = key
+          Event = key,
+          Simulation = replication
         ) |>
         dplyr::mutate(
           Day = round(Week * 7, 2),
@@ -263,7 +282,8 @@ mod_simulation_server <- function(id) {
         `OP followup rate (%)` = op_fup_rate,
         `Pre-op LOS (days)` = pre_op_los,
         `Post-op LOS (days)` = post_op_los,
-        `Simulation length (weeks)` = forecast_length
+        `Simulation length (weeks)` = forecast_length,
+        `Number of simulation runs` = num_simulations
       )
       config_details <- paste(
           names(config_details),
@@ -278,9 +298,11 @@ mod_simulation_server <- function(id) {
 
       # make a plot
       output$queuePlot <- renderPlot(
-        ggplot2::ggplot(sim_resources, ggplot2::aes(time, queue)) +
-            ggplot2::geom_line(colour = "firebrick", alpha = 0.7) +
-            ggplot2::facet_wrap(ggplot2::vars(resource), scale = "free_y") +
+        ggplot2::ggplot(sim_resources, ggplot2::aes(x = time)) +
+          ggplot2::geom_line(aes(y = queue), colour = "firebrick", alpha = 0.7) +
+          ggplot2::geom_line(aes(y = queue_upper_ci), colour = "grey", alpha = 0.7, linetype = 2) +
+          ggplot2::geom_line(aes(y = queue_lower_ci), colour = "grey", alpha = 0.7, linetype = 2) +
+          ggplot2::facet_wrap(ggplot2::vars(resource), scale = "free_y") +
           labs(
             title = "Queue sizes for each resource",
             subtitle = "Are the queue sizes stable?  Do backlogs build up or reduce over time?",
@@ -305,7 +327,11 @@ mod_simulation_server <- function(id) {
           theme(legend.position = "none")
       )
       output$utilisationPlot <- renderPlot(
-        plot(sim_resources, metric = "utilization") +
+        plot(res$sim |>
+               get_mon_resources() |>
+               dplyr::mutate(
+                resource = factor(resource, levels = c("OP Clinic", "Theatre", "Bed"))
+          ), metric = "utilization") +
           labs(
             title = "Resource utilisation",
             x = "Resource",
