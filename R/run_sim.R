@@ -116,7 +116,8 @@ run_sim <- function(model_config) {
   if(Sys.info()[['sysname']] == "Windows"){
     num_cores <- 1
   } else{
-    num_cores <- parallel::detectCores() - 1
+    # use one core, or one less than max cores if more than one available
+    num_cores <- min(1, parallel::detectCores() - 1)
   }
   print(glue::glue("Using {num_cores} cores"))
   # Need option to make this dynamic
