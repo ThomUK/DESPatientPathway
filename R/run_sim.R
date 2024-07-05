@@ -117,7 +117,7 @@ run_sim <- function(model_config) {
     num_cores <- 1
   } else{
     # use one core, or one less than max cores if more than one available
-    num_cores <- min(1, parallel::detectCores() - 1)
+    num_cores <- max(1, parallel::detectCores() - 1)
   }
   print(glue::glue("Using {num_cores} cores"))
   # Need option to make this dynamic
