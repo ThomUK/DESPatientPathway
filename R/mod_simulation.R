@@ -92,7 +92,7 @@ mod_simulation_ui <- function(id) {
       hr(),
       h4("Simulation results:"),
       p("This table shows the simulation results patient by patient.  Use the search box to search for an event, or a patient."),
-      dataTableOutput(NS(id, "attributesTable")),
+      DT::DTOutput(NS(id, "attributesTable")),
       hr(),
       h4("Patient pathway:"),
       DiagrammeR::grVizOutput(NS(id, "trajectoryPlot"), height = "2000px"),
